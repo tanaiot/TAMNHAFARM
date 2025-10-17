@@ -17,44 +17,37 @@
   </script>
 
   <!-- Bước 1: nạp đúng SDK 8.1.16 và thêm query chống cache -->
-  <script src="https://openstatic.ys7.com/ezuikit_js/v8.1.16/ezuikit.js?v=816_anti_cache"></script>
+  <script src="https://openstatic.ys7.com/ezuikit_js/v8.1.16/ezuikit.js?v=816"></script>
 
-  <style>
-    #my-player{width:100%;max-width:800px;margin:20px auto;border-radius:8px;
-      box-shadow:0 5px 20px rgba(0,0,0,.15);overflow:hidden}
-  </style>
-</head>
-<body>
-  <h2>Livestream Trực Tiếp</h2>
-  <div id="my-player"></div>
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const APP_KEY      = "704eed1686e1485bbd7c07f40665c471";
+    const ACCESS_TOKEN = "at.XXXXXXXX";           // token mới
+    const DEVICE_SN    = "BF0374481";
+    const CHANNEL      = 1;
+    const VERIFY_CODE  = "TN79797979";            // "" nếu đã tắt mã hóa
 
-  <script>
-    document.addEventListener('DOMContentLoaded', () => {
-      const APP_KEY      = "704eed1686e1485bbd7c07f40665c471"; // thay đúng AppKey
-      const ACCESS_TOKEN = "at.73ihdkfh0xu3780i1ilw6uyg9v9xawmm-13m6g2aqo4-1ew65ln-hxs9dv8vp"; // token MỚI
-      const DEVICE_SN    = "BF0374481";  // serial
-      const CHANNEL      = 1;            // kênh
-      const VERIFY_CODE  = "TN79797979"; // để "" nếu đã tắt mã hoá trên thiết bị
+    const ezUrl = VERIFY_CODE
+      ? `ezopen://${VERIFY_CODE}@open.ys7.com/${DEVICE_SN}/${CHANNEL}.hd.live`
+      : `ezopen://open.ys7.com/${DEVICE_SN}/${CHANNEL}.hd.live`;
 
-      // Dùng cùng domain open.ys7.com cho EZUIKit v8
-      const ezUrl = VERIFY_CODE && VERIFY_CODE.trim() !== ""
-        ? `ezopen://${VERIFY_CODE}@open.ys7.com/${DEVICE_SN}/${CHANNEL}.hd.live`
-        : `ezopen://open.ys7.com/${DEVICE_SN}/${CHANNEL}.hd.live`;
+    // ÉP staticPath tới bản bạn tự host (đúng 8.1.16)
+    const STATIC_PATH = "https://tanaiot.github.io/ezuikit_static";
 
-      console.log("EZURL =", ezUrl);
-      console.log("Protocol =", location.protocol);
-
-      const player = new EZUIKit.EZUIKitPlayer({
-        id: 'my-player',
-        appKey: APP_KEY,
-        accessToken: ACCESS_TOKEN,
-        url: ezUrl,
-        template: 'simple',
-        autoplay: true,
-        width: 800,
-        height: 450,
-      });
+    const player = new EZUIKit.EZUIKitPlayer({
+      id: 'my-player',
+      appKey: APP_KEY,
+      accessToken: ACCESS_TOKEN,
+      url: ezUrl,
+      template: 'simple',
+      autoplay: true,
+      width: 800,
+      height: 450,
+      staticPath: STATIC_PATH,                  // 👈 quan trọng
+      env: { domain: "https://open.ys7.com" }
     });
-  </script>
+  });
+</script>
 </body>
 </html>
+
