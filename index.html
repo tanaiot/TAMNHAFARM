@@ -1,1 +1,171 @@
-html
+<!DOCTYPE html>
+<html lang="vi">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Rabbit Farm - Trang trại thỏ Công nghệ cao</title>
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css"
+    />
+    <link rel="stylesheet" href="style.css" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
+    />
+  </head>
+  <body>
+    <header class="main-header">
+      <nav class="navbar">
+        <div class="nav-left">
+          <a href="#" class="logo-text">RABBIT FARM</a>
+        </div>
+        <div class="nav-center">
+          <ul class="nav-links">
+            <li><a href="#">Trang chủ</a></li>
+            <li><a href="#">Công nghệ</a></li>
+            <li><a href="#">Quy trình</a></li>
+            <li><a href="#">Về chúng tôi</a></li>
+            <li><a href="#">Liên hệ</a></li>
+          </ul>
+        </div>
+        <div class="nav-right">
+          <div class="nav-icons">
+            <div id="language-switcher"></div>
+          </div>
+          <button class="hamburger-menu">
+            <i class="fa-solid fa-bars"></i>
+          </button>
+        </div>
+      </nav>
+    </header>
+
+    <section class="hero-section">
+      <video
+        src="video_intro.mp4"
+        autoplay
+        loop
+        muted
+        playsinline
+        class="hero-video-bg"
+      ></video>
+      <div class="video-overlay"></div>
+      <div class="hero-container">
+        <div class="hero-content">
+          <h1>Nông trại thỏ thông minh</h1>
+          <p>
+            Ứng dụng Trí tuệ nhân tạo (AI) và IoT để theo dõi, chăm sóc, và tối
+            ưu hóa quy trình chăn nuôi thỏ sạch.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <main>
+      <section class="feature-section">
+        <div class="feature-container">
+          <div class="feature-content">
+            <h2>Đếm và giám sát thỏ bằng AI</h2>
+            <p>
+              Sự kết hợp giữa camera, thuật toán xử lý hình ảnh và mô hình trí
+              tuệ nhân tạo giúp theo dõi số lượng, phát hiện hành vi bất thường
+              và đánh giá sức khỏe của đàn thỏ 24/7, hướng đến tương lai nuôi
+              trồng thông minh.
+            </p>
+            <a href="#" class="btn-primary">Tìm hiểu công nghệ</a>
+          </div>
+          <div class="feature-image">
+            <div class="swiper mySwiper">
+              <div class="swiper-wrapper">
+                <div class="swiper-slide">
+                  <img src="tho-khoe-manh.jpg" alt="Thỏ đang ăn" />
+                </div>
+                <div class="swiper-slide">
+                  <img src="tho.jpg" alt="Thỏ trắng" />
+                </div>
+                <div class="swiper-slide">
+                  <img src="trang-trai-sach.jpg" alt="Thỏ trên đồng cỏ" />
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="process-section">
+        <h2 class="section-title">Quy trình hoạt động</h2>
+        <div class="process-container">
+          <div class="process-step">
+            <i class="fa-solid fa-camera"></i>
+            <h3>1. Thu thập dữ liệu</h3>
+            <p>
+              Hệ thống camera và cảm biến IoT liên tục thu thập hình ảnh, nhiệt
+              độ, độ ẩm trong chuồng trại.
+            </p>
+          </div>
+          <div class="process-step">
+            <i class="fa-solid fa-brain"></i>
+            <h3>2. Phân tích AI</h3>
+            <p>
+              AI phân tích dữ liệu real-time để nhận diện từng cá thể, theo dõi
+              hành vi ăn uống, và phát hiện dấu hiệu bệnh sớm.
+            </p>
+          </div>
+          <div class="process-step">
+            <i class="fa-solid fa-bell"></i>
+            <h3>3. Cảnh báo tức thì</h3>
+            <p>
+              Tự động gửi cảnh báo đến điện thoại của người quản lý khi phát
+              hiện vấn đề, giúp can thiệp kịp thời.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <section class="benefits-section">
+        <div class="benefits-container">
+          <div class="benefits-row">
+            <div class="benefits-image">
+              <img src="tho-khoe-manh.jpg" alt="Thỏ khỏe mạnh" />
+            </div>
+            <div class="benefits-content">
+              <h2>Nâng cao sức khỏe vật nuôi</h2>
+              <p>
+                Phát hiện bệnh sớm hơn đến 70% so với phương pháp truyền thống,
+                giảm thiểu tỷ lệ thất thoát và hạn chế sử dụng kháng sinh.
+              </p>
+            </div>
+          </div>
+          <div class="benefits-row reverse">
+            <div class="benefits-image">
+              <img src="trang-trai-sach.jpg" alt="Trang trại sạch sẽ" />
+            </div>
+            <div class="benefits-content">
+              <h2>Tối ưu hiệu suất chăn nuôi</h2>
+              <p>
+                Dữ liệu chính xác về tăng trưởng và hành vi giúp tối ưu hóa khẩu
+                phần ăn và môi trường sống, nâng cao chất lượng sản phẩm đầu ra.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="cta-section">
+        <h2>Sẵn sàng nâng tầm trang trại của bạn?</h2>
+        <p>Hãy để công nghệ của chúng tôi đồng hành cùng bạn.</p>
+        <a href="#" class="btn-primary">Liên hệ tư vấn</a>
+      </section>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-container">
+        <p class="logo-text">RABBIT FARM</p>
+        <p>&copy; 2025 Rabbit Farm. All Rights Reserved.</p>
+      </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+    <script src="script.js"></script>
+  </body>
+</html>
