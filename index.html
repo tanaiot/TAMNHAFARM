@@ -1,62 +1,54 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>EZVIZ Live (v8.1.16)</title>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>EZVIZ Live</title>
 
-  <!-- Ép SDK dùng đúng static của 8.1.16 (tuỳ chọn, có thể bỏ nếu bạn tự set trong constructor) -->
+  <!-- Ép SDK dùng staticPath 8.1.16 -->
   <script>
     window.EZUIKitConfig = {
       staticPath: "https://openstatic.ys7.com/ezuikit_js/v8.1.16/ezuikit_static"
     };
     if (location.protocol === "file:") {
-      alert("Hãy chạy qua HTTP/HTTPS (Live Server, http-server, ...)");
+      alert("Hãy mở qua http/https (Live Server, nginx, ...).");
     }
   </script>
-
-  <!-- Nạp đúng SDK 8.1.16 -->
-  <script src="https://openstatic.ys7.com/ezuikit_js/v8.1.16/ezuikit.js?v=816"></script>
+  <script src="https://openstatic.ys7.com/ezuikit_js/v8.1.16/ezuikit.js"></script>
 
   <style>
-    #my-player{
-      width:100%; max-width:800px; margin:20px auto;
-      border-radius:8px; box-shadow:0 5px 20px rgba(0,0,0,.15); overflow:hidden;
-      background:#000;
-    }
+    body{font-family:system-ui,Arial;margin:0;padding:24px;background:#0b0b0c;color:#eee}
+    #my-player{width:100%;max-width:860px;margin:12px auto;background:#000;border-radius:10px;box-shadow:0 8px 30px rgba(0,0,0,.25);overflow:hidden}
+    h2{text-align:center;margin:0 0 12px}
   </style>
 </head>
 <body>
-  <h2 style="text-align:center">Livestream Trực Tiếp</h2>
-  <!-- PHẢI có container này -->
+  <h2>EZVIZ Livestream</h2>
   <div id="my-player"></div>
 
   <script>
     document.addEventListener('DOMContentLoaded', () => {
       const APP_KEY      = "704eed1686e1485bbd7c07f40665c471";
-      const ACCESS_TOKEN = "at.XXXXXXXX";          // thay token thật, mới
-      const DEVICE_SN    = "BF0374481";
+      const ACCESS_TOKEN = "at.73ihdkfh0xu3780i1ilw6uyg9v9xawmm-13m6g2aqo4-1ew65ln-hxs9dv8vp";     // token mới, đúng app
+      const DEVICE_SN    = "BF0374481";    // ví dụ "BF0374481"
       const CHANNEL      = 1;
-      const VERIFY_CODE  = "TN79797979";           // "" nếu đã tắt mã hoá
+      const VERIFY_CODE  = "";      // "" nếu đã tắt mã hóa
 
       const ezUrl = VERIFY_CODE
         ? `ezopen://${VERIFY_CODE}@open.ys7.com/${DEVICE_SN}/${CHANNEL}.hd.live`
         : `ezopen://open.ys7.com/${DEVICE_SN}/${CHANNEL}.hd.live`;
 
-      console.log("EZURL =", ezUrl, "Protocol =", location.protocol);
-
-      // Nếu bạn đã tự host 'ezuikit_static' 8.1.16, trỏ staticPath vào đó.
-      // Nếu CHƯA host, có thể tạm bỏ dòng staticPath để dùng CDN của EZVIZ.
-      const player = new EZUIKit.EZUIKitPlayer({
+      new EZUIKit.EZUIKitPlayer({
         id: 'my-player',
         appKey: APP_KEY,
         accessToken: ACCESS_TOKEN,
         url: ezUrl,
         template: 'simple',
         autoplay: true,
-        width: 800,
-        height: 450,
-        // staticPath: "https://tanaiot.github.io/ezuikit_static", // bật khi bạn đã host đúng thư mục
+        width: 860,
+        height: 484,
+        // Nếu bạn tự host ezuikit_static 8.1.16, thêm dòng dưới để chắc chắn không bị kéo bản alpha:
+        // staticPath: "https://<domain-cua-ban>/ezuikit_static",
         env: { domain: "https://open.ys7.com" }
       });
     });
