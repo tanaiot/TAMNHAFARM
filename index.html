@@ -1,57 +1,1109 @@
 <!DOCTYPE html>
 <html lang="vi">
-<head>
-  <meta charset="UTF-8"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1"/>
-  <title>EZVIZ Live</title>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Trang Trại Chồn Thông Minh - Đầu Tư An Toàn, Minh Bạch</title>
 
-  <!-- Ép SDK dùng staticPath 8.1.16 -->
-  <script>
-    window.EZUIKitConfig = {
-      staticPath: "https://openstatic.ys7.com/ezuikit_js/v8.1.16/ezuikit_static"
-    };
-    if (location.protocol === "file:") {
-      alert("Hãy mở qua http/https (Live Server, nginx, ...).");
-    }
-  </script>
-  <script src="https://openstatic.ys7.com/ezuikit_js/v8.1.16/ezuikit.js"></script>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
+      integrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkPKZ5QiAj6Ta86w+fsb2TkcmfRyVX3pBnMFcV7oQPJkl9QevSCWr3W6A=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    />
 
-  <style>
-    body{font-family:system-ui,Arial;margin:0;padding:24px;background:#0b0b0c;color:#eee}
-    #my-player{width:100%;max-width:860px;margin:12px auto;background:#000;border-radius:10px;box-shadow:0 8px 30px rgba(0,0,0,.25);overflow:hidden}
-    h2{text-align:center;margin:0 0 12px}
-  </style>
-</head>
-<body>
-  <h2>EZVIZ Livestream</h2>
-  <div id="my-player"></div>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
 
-  <script>
-    document.addEventListener('DOMContentLoaded', () => {
-      const APP_KEY      = "704eed1686e1485bbd7c07f40665c471";
-      const ACCESS_TOKEN = "at.73ihdkfh0xu3780i1ilw6uyg9v9xawmm-13m6g2aqo4-1ew65ln-hxs9dv8vp";     // token mới, đúng app
-      const DEVICE_SN    = "BF0374481";    // ví dụ "BF0374481"
-      const CHANNEL      = 1;
-      const VERIFY_CODE  = "";      // "" nếu đã tắt mã hóa
+      body {
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        line-height: 1.6;
+        color: #333;
+      }
 
-      const ezUrl = VERIFY_CODE
-        ? `ezopen://${VERIFY_CODE}@open.ys7.com/${DEVICE_SN}/${CHANNEL}.hd.live`
-        : `ezopen://open.ys7.com/${DEVICE_SN}/${CHANNEL}.hd.live`;
+      /* Header */
+      header {
+        background: linear-gradient(135deg, #099204 0%, #099623 100%);
+        color: white;
+        position: fixed;
+        width: 100%;
+        top: 0;
+        z-index: 1000;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+      }
 
-      new EZUIKit.EZUIKitPlayer({
-        id: 'my-player',
-        appKey: APP_KEY,
-        accessToken: ACCESS_TOKEN,
-        url: ezUrl,
-        template: 'simple',
-        autoplay: true,
-        width: 860,
-        height: 484,
-        // Nếu bạn tự host ezuikit_static 8.1.16, thêm dòng dưới để chắc chắn không bị kéo bản alpha:
-        // staticPath: "https://<domain-cua-ban>/ezuikit_static",
-        env: { domain: "https://open.ys7.com" }
+      nav {
+        max-width: 1200px;
+        margin: 0 auto;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 0.5rem 2rem;
+        height: 150px;
+      }
+
+      .logo-container {
+        display: flex;
+        align-items: center;
+        text-decoration: none;
+        color: white;
+      }
+
+      .logo-img {
+        height: 80px;
+        width: 80px;
+        border-radius: 50%;
+        margin-right: 15px;
+      }
+
+      .farm-name {
+        font-size: 1.2rem;
+        font-weight: bold;
+        padding-right: 5px;
+      }
+
+      .nav-links {
+        display: flex;
+        gap: 2rem;
+        list-style: none;
+      }
+
+      .nav-links a {
+        color: white;
+        text-decoration: none;
+        transition: color 0.3s;
+      }
+
+      .nav-links a:hover {
+        color: #3498db;
+      }
+
+      .mobile-menu-icon {
+        display: none; /* Mặc định ẩn trên màn hình lớn */
+        background: none;
+        border: none;
+        color: white;
+        font-size: 1.6rem;
+        cursor: pointer;
+        z-index: 1100; /* Đảm bảo nút luôn ở trên cùng */
+      }
+
+      /* Hero Section */
+      .hero {
+        position: relative;
+        overflow: hidden;
+        color: white;
+        padding: 150px 2rem 100px;
+        text-align: center;
+        margin-top: 80px; /* Bằng chiều cao của header */
+      }
+
+      #hero-video {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        min-width: 100%;
+        min-height: 100%;
+        width: auto;
+        height: auto;
+        z-index: -1;
+        transform: translateX(-50%) translateY(-50%);
+        object-fit: cover;
+      }
+
+      .hero::after {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.5);
+        z-index: 0;
+      }
+
+      .hero-content {
+        position: relative;
+        z-index: 1;
+      }
+
+      .hero h1 {
+        font-size: 3rem;
+        margin-bottom: 1rem;
+        animation: fadeInUp 1s;
+      }
+
+      .hero p {
+        font-size: 1.3rem;
+        margin-bottom: 2rem;
+        animation: fadeInUp 1s 0.2s both;
+      }
+
+      .cta-button {
+        background: #099204;
+        color: white;
+        padding: 15px 40px;
+        border: none;
+        border-radius: 50px;
+        font-size: 1.1rem;
+        cursor: pointer;
+        transition: all 0.3s;
+        animation: fadeInUp 1s 0.4s both;
+        text-decoration: none;
+        display: inline-block;
+      }
+
+      .cta-button:hover {
+        background: #066403;
+        transform: translateY(-3px);
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+      }
+
+      /* Features Section */
+      .features {
+        max-width: 1200px;
+        margin: 80px auto;
+        padding: 0 2rem;
+      }
+
+      .features h2 {
+        text-align: center;
+        font-size: 2.5rem;
+        margin-bottom: 3rem;
+        color: #2c3e50;
+      }
+
+      .feature-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 2rem;
+      }
+
+      .feature-card {
+        background: white;
+        padding: 2rem;
+        border-radius: 15px;
+        box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+        transition: transform 0.3s, box-shadow 0.3s;
+        text-align: center;
+      }
+
+      .feature-card:hover {
+        transform: translateY(-10px);
+        box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
+      }
+
+      .feature-icon {
+        font-size: 3rem;
+        margin-bottom: 1rem;
+        color: #099204;
+      }
+
+      .feature-card h3 {
+        color: #2c3e50;
+        margin-bottom: 1rem;
+        font-size: 1.5rem;
+      }
+
+      /* Process Section */
+      .process {
+        background: #f8f9fa;
+        padding: 80px 2rem;
+      }
+
+      .process-container {
+        max-width: 1200px;
+        margin: 0 auto;
+      }
+
+      .process h2 {
+        text-align: center;
+        font-size: 2.5rem;
+        margin-bottom: 3rem;
+        color: #2c3e50;
+      }
+
+      .process-steps {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 2rem;
+      }
+
+      .step {
+        background: white;
+        padding: 2rem;
+        border-radius: 15px;
+        position: relative;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+      }
+
+      .step-number {
+        position: absolute;
+        top: -20px;
+        left: 20px;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.5rem;
+        font-weight: bold;
+      }
+
+      .step h3 {
+        margin-top: 1.5rem;
+        color: #2c3e50;
+        margin-bottom: 1rem;
+      }
+
+      /* Technology Section */
+      .technology {
+        max-width: 1200px;
+        margin: 80px auto;
+        padding: 0 2rem;
+      }
+
+      .technology h2 {
+        text-align: center;
+        font-size: 2.5rem;
+        margin-bottom: 3rem;
+        color: #2c3e50;
+      }
+
+      .tech-content {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 3rem;
+        align-items: center;
+      }
+
+      .tech-video-container {
+        position: relative;
+        border-radius: 15px;
+        overflow: hidden;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+      }
+
+      .video-wrapper {
+        position: relative;
+        padding-bottom: 56.25%; /* 16:9 Aspect Ratio */
+        height: 0;
+      }
+
+      .video-wrapper iframe {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+      }
+
+      .video-overlay-text {
+        position: absolute;
+        bottom: 20px;
+        left: 20px;
+        background: rgba(0, 0, 0, 0.05);
+        color: white;
+        padding: 10px 15px;
+        border-radius: 8px;
+        z-index: 1;
+        font-size: 0.6rem;
+        backdrop-filter: blur(5px);
+      }
+
+      .video-overlay-text p {
+        margin: 0;
+        line-height: 1.5;
+      }
+
+      .tech-features {
+        list-style: none;
+      }
+
+      .tech-features li {
+        padding: 1rem 0;
+        border-bottom: 1px solid #ecf0f1;
+        display: flex;
+        align-items: center;
+      }
+
+      .tech-features li:before {
+        content: "✓";
+        color: #27ae60;
+        font-weight: bold;
+        font-size: 1.5rem;
+        margin-right: 1rem;
+      }
+
+      /* Certification Section */
+      .certification {
+        background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+        color: white;
+        padding: 80px 2rem;
+        text-align: center;
+      }
+
+      .certification h2 {
+        font-size: 2.5rem;
+        margin-bottom: 2rem;
+      }
+
+      .cert-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 2rem;
+        max-width: 1000px;
+        margin: 0 auto;
+      }
+
+      .cert-card {
+        background: rgba(255, 255, 255, 0.1);
+        padding: 2rem;
+        border-radius: 10px;
+        backdrop-filter: blur(10px);
+        transition: background 0.3s;
+        cursor: pointer;
+      }
+
+      .cert-card:hover {
+        background: rgba(255, 255, 255, 0.2);
+      }
+
+      .cert-card h3 {
+        margin-bottom: 0.5rem;
+      }
+
+      .cert-icon {
+        font-size: 3rem;
+        margin-bottom: 1rem;
+      }
+
+      /* Investment Section */
+      .investment {
+        max-width: 1200px;
+        margin: 80px auto;
+        padding: 0 2rem;
+      }
+
+      .investment h2 {
+        text-align: center;
+        font-size: 2.5rem;
+        margin-bottom: 3rem;
+        color: #2c3e50;
+      }
+
+      .investment-packages {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 2rem;
+      }
+
+      .package {
+        background: white;
+        border: 2px solid #ecf0f1;
+        border-radius: 15px;
+        padding: 2rem;
+        text-align: center;
+        transition: all 0.3s;
+      }
+
+      .package:hover {
+        border-color: #667eea;
+        transform: scale(1.05);
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+      }
+
+      .package.featured {
+        border-color: #e74c3c;
+        transform: scale(1.05);
+      }
+
+      .package h3 {
+        color: #2c3e50;
+        font-size: 1.8rem;
+        margin-bottom: 1rem;
+      }
+
+      .package .price {
+        font-size: 2.5rem;
+        color: #667eea;
+        font-weight: bold;
+        margin: 1rem 0;
+      }
+
+      .package ul {
+        list-style: none;
+        margin: 2rem 0;
+      }
+
+      .package li {
+        padding: 0.5rem 0;
+      }
+
+      /* Contact Section */
+      .contact {
+        background: #f8f9fa;
+        padding: 80px 2rem;
+      }
+
+      .contact-container {
+        max-width: 800px;
+        margin: 0 auto;
+        text-align: center;
+      }
+
+      .contact h2 {
+        font-size: 2.5rem;
+        margin-bottom: 2rem;
+        color: #2c3e50;
+      }
+
+      .contact-form {
+        background: white;
+        padding: 3rem;
+        border-radius: 15px;
+        box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+      }
+
+      .form-group {
+        margin-bottom: 1.5rem;
+        text-align: left;
+      }
+
+      .form-group label {
+        display: block;
+        margin-bottom: 0.5rem;
+        color: #2c3e50;
+        font-weight: 600;
+      }
+
+      .form-group input,
+      .form-group textarea {
+        width: 100%;
+        padding: 12px;
+        border: 2px solid #ecf0f1;
+        border-radius: 8px;
+        font-size: 1rem;
+        transition: border-color 0.3s;
+      }
+
+      .form-group input:focus,
+      .form-group textarea:focus {
+        outline: none;
+        border-color: #667eea;
+      }
+
+      .form-group textarea {
+        resize: vertical;
+        min-height: 120px;
+      }
+
+      /* Footer */
+      footer {
+        background: #2c3e50;
+        color: white;
+        padding: 3rem 2rem;
+        text-align: center;
+      }
+
+      .footer-content {
+        max-width: 1200px;
+        margin: 0 auto;
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 2rem;
+        text-align: left;
+      }
+
+      .footer-section h3 {
+        margin-bottom: 1rem;
+      }
+
+      .footer-section ul {
+        list-style: none;
+      }
+
+      .footer-section ul li {
+        padding: 0.5rem 0;
+      }
+
+      .footer-section a {
+        color: #ecf0f1;
+        text-decoration: none;
+        transition: color 0.3s;
+      }
+
+      .footer-section a:hover {
+        color: #3498db;
+      }
+
+      .footer-bottom {
+        margin-top: 2rem;
+        padding-top: 2rem;
+        border-top: 1px solid rgba(255, 255, 255, 0.1);
+        text-align: center;
+      }
+
+      #image-popup {
+        display: none;
+        position: fixed;
+        z-index: 2000;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        overflow: auto;
+        background-color: rgba(0, 0, 0, 0.85);
+        align-items: center;
+        justify-content: center;
+      }
+
+      #popup-content {
+        position: relative;
+        margin: auto;
+        display: block;
+        background-color: #fff;
+        padding: 8px;
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.5);
+        max-height: 90vh;
+        max-width: 800px;
+        width: auto;
+        height: auto;
+        max-width: 95%;
+        animation: zoomIn 0.3s;
+      }
+
+      @keyframes zoomIn {
+        from {
+          transform: scale(0.8);
+        }
+        to {
+          transform: scale(1);
+        }
+      }
+
+      #popup-close {
+        position: absolute;
+        top: 15px;
+        right: 35px;
+        color: #fff;
+        font-size: 40px;
+        font-weight: bold;
+        transition: 0.3s;
+        cursor: pointer;
+        z-index: 2001;
+      }
+
+      #popup-close:hover,
+      #popup-close:focus {
+        color: #bbb;
+        text-decoration: none;
+      }
+
+      @keyframes fadeInUp {
+        from {
+          opacity: 0;
+          transform: translateY(30px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+      #form-status {
+        margin-top: 1rem;
+        font-weight: bold;
+      }
+
+      @media (max-width: 768px) {
+        .hero h1 {
+          font-size: 2rem;
+        }
+
+        .tech-content {
+          grid-template-columns: 1fr;
+        }
+
+        /* --- Bắt đầu phần CSS cho menu di động --- */
+
+        .mobile-menu-icon {
+          display: block; /* Hiện nút hamburger trên di động */
+        }
+
+        .nav-links {
+          /* Chuyển menu thành dạng cột, nằm tuyệt đối bên dưới header */
+          display: none; /* Mặc định ẩn menu */
+          flex-direction: column;
+          position: absolute;
+          top: 80px; /* Bằng chiều cao của header */
+          left: 0;
+          width: 100%;
+          background: linear-gradient(135deg, #099204 0%, #099623 100%);
+          box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+          padding: 1rem 0;
+        }
+
+        .nav-links.show {
+          display: flex; /* Class 'show' sẽ được JS thêm vào để hiện menu */
+        }
+
+        .nav-links li {
+          text-align: center;
+          width: 100%;
+          padding: 1rem 0;
+        }
+
+        .nav-links li:not(:last-child) {
+          border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <nav>
+        <a href="#home" class="logo-container">
+          <img src="Logo.jpg" alt="TÂM NHA FARM Logo" class="logo-img" />
+          <span class="farm-name">TÂM NHA FARM</span>
+        </a>
+
+        <ul class="nav-links" id="nav-links-menu">
+          <li><a href="#home">Trang Chủ</a></li>
+          <li><a href="#features">Ưu Điểm</a></li>
+          <li><a href="#process">Quy Trình</a></li>
+          <li><a href="#technology">Công Nghệ</a></li>
+          <li><a href="#investment">Đầu Tư</a></li>
+          <li><a href="#contact">Liên Hệ</a></li>
+        </ul>
+
+        <button id="mobile-menu-toggle" class="mobile-menu-icon">
+          <i class="fas fa-bars"></i>
+        </button>
+      </nav>
+    </header>
+
+    <section class="hero" id="home">
+      <video playsinline autoplay muted loop id="hero-video">
+        <source src="video_intro.mp4" type="video/mp4" />
+      </video>
+      <div class="hero-content">
+        <h1>Đầu Tư Nuôi Chồn Từ Xa An Toàn & Minh Bạch</h1>
+        <p>
+          Theo dõi vật nuôi của bạn 24/7 qua ứng dụng điện thoại - Quy trình
+          chuyên nghiệp - Giấy chứng nhận đầy đủ
+        </p>
+        <a href="#contact" class="cta-button">Bắt Đầu Đầu Tư Ngay</a>
+      </div>
+    </section>
+
+    <section class="features" id="features">
+      <h2>Tại Sao Chọn Chúng Tôi?</h2>
+      <div class="feature-grid">
+        <div class="feature-card">
+          <div class="feature-icon"><i class="fas fa-mobile-alt"></i></div>
+          <h3>Giám Sát Từ Xa</h3>
+          <p>
+            Theo dõi chồn của bạn 24/7 qua ứng dụng điện thoại với camera trực
+            tiếp và cập nhật tình trạng sức khỏe
+          </p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon"><i class="fas fa-trophy"></i></div>
+          <h3>Giấy Chứng Nhận</h3>
+          <p>
+            Đầy đủ giấy phép kinh doanh, chứng nhận thú y và các giấy tờ pháp lý
+            minh bạch
+          </p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon"><i class="fas fa-user-doctor"></i></div>
+          <h3>Chăm Sóc Chuyên Nghiệp</h3>
+          <p>
+            Đội ngũ chuyên gia thú y và nhân viên giàu kinh nghiệm chăm sóc 24/7
+          </p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon"><i class="fas fa-sack-dollar"></i></div>
+          <h3>Lợi Nhuận Hấp Dẫn</h3>
+          <p>
+            Cam kết lợi nhuận ổn định với chu kỳ nuôi rõ ràng và thị trường tiêu
+            thụ đảm bảo
+          </p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon"><i class="fas fa-lock"></i></div>
+          <h3>An Toàn & Bảo Mật</h3>
+          <p>
+            Hợp đồng pháp lý rõ ràng, bảo hiểm vật nuôi và cam kết hoàn trả vốn
+          </p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon"><i class="fas fa-chart-bar"></i></div>
+          <h3>Báo Cáo Minh Bạch</h3>
+          <p>
+            Cập nhật báo cáo tăng trưởng, chi phí và lợi nhuận định kỳ hàng
+            tháng
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <section class="process" id="process">
+      <div class="process-container">
+        <h2>Quy Trình Nuôi Dưỡng Chuyên Nghiệp</h2>
+        <div class="process-steps">
+          <div class="step">
+            <div class="step-number">1</div>
+            <h3>Chọn Giống & Kiểm Tra</h3>
+            <p>
+              Chọn lọc chồn giống khỏe mạnh, có nguồn gốc rõ ràng. Kiểm tra sức
+              khỏe toàn diện bởi bác sĩ thú y.
+            </p>
+          </div>
+          <div class="step">
+            <div class="step-number">2</div>
+            <h3>Nuôi Dưỡng & Chăm Sóc</h3>
+            <p>
+              Chế độ dinh dưỡng khoa học, chuồng trại sạch sẽ, theo dõi sức khỏe
+              hàng ngày.
+            </p>
+          </div>
+          <div class="step">
+            <div class="step-number">3</div>
+            <h3>Giám Sát & Báo Cáo</h3>
+            <p>
+              Cập nhật tình trạng qua ứng dụng, camera trực tiếp, báo cáo tăng
+              trưởng định kỳ.
+            </p>
+          </div>
+          <div class="step">
+            <div class="step-number">4</div>
+            <h3>Thu Hoạch & Thanh Toán</h3>
+            <p>
+              Thu hoạch đúng thời điểm, tiêu thụ sản phẩm và thanh toán lợi
+              nhuận cho nhà đầu tư.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="technology" id="technology">
+      <h2>Công Nghệ Giám Sát Hiện Đại</h2>
+      <div class="tech-content">
+        <div class="tech-video-container">
+          <div class="video-wrapper">
+            <iframe
+              src="https://www.youtube.com/embed/M1F2l_eOF8A?autoplay=1&mute=1&loop=1&playlist=M1F2l_eOF8A&controls=0&showinfo=0&autohide=1"
+              title="YouTube video player"
+              frameborder="0"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+              allowfullscreen
+            ></iframe>
+          </div>
+          <div class="video-overlay-text">
+            <p><strong>Tên chủ vật nuôi:</strong> Nguyễn Văn A</p>
+            <p>
+              <strong>Thông tin:</strong> Chồn #1234 - Tình trạng: Khỏe mạnh
+            </p>
+            <p>
+              <strong>Thông tin:</strong> Chồn #1234 - Tình trạng: Khỏe mạnh
+            </p>
+            <p>
+              <strong>Thông tin:</strong> Chồn #1234 - Tình trạng: Khỏe mạnh
+            </p>
+            <p>
+              <strong>Thông tin:</strong> Chồn #1234 - Tình trạng: Khỏe mạnh
+            </p>
+          </div>
+        </div>
+        <div>
+          <ul class="tech-features">
+            <li>
+              <strong>Camera HD 24/7: </strong> Xem trực tiếp chuồng nuôi bất cứ
+              lúc nào
+            </li>
+            <li>
+              <strong>Thông Báo Real-time: </strong> Cập nhật tình trạng sức
+              khỏe, cho ăn, hoạt động
+            </li>
+            <li>
+              <strong>Lịch Sử Tăng Trưởng: </strong> Theo dõi cân nặng, phát
+              triển qua từng giai đoạn
+            </li>
+            <li>
+              <strong>Báo Cáo Tài Chính: </strong> Chi phí, lợi nhuận dự kiến
+              được cập nhật liên tục
+            </li>
+            <li>
+              <strong>Tương Tác Trực Tiếp: </strong> Liên hệ với đội ngũ chăm
+              sóc qua chat
+            </li>
+            <li>
+              <strong>Bảo Mật Cao: </strong> Dữ liệu được mã hóa và bảo vệ tuyệt
+              đối
+            </li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <section class="certification">
+      <h2>Giấy Chứng Nhận & Pháp Lý</h2>
+      <div class="cert-grid">
+        <div
+          class="cert-card"
+          data-img-src="./anh/giaychungnhan/macosonuoi.jpg"
+        >
+          <div class="cert-icon"><i class="fas fa-file-alt"></i></div>
+          <h3>MÃ SỐ CƠ SỞ NUÔI, TRỒNG</h3>
+        </div>
+        <div
+          class="cert-card"
+          data-img-src="./anh/giaychungnhan/sotheodoihoatdong.jpg"
+        >
+          <div class="cert-icon"><i class="fas fa-book-medical"></i></div>
+          <h3>SỔ THEO DÕI HOẠT ĐỘNG</h3>
+        </div>
+        <div
+          class="cert-card"
+          data-img-src="./anh/giaychungnhan/giaychungnhan.jpg"
+        >
+          <div class="cert-icon"><i class="fas fa-check-circle"></i></div>
+          <h3>GIẤY CHỨNG NHẬN</h3>
+        </div>
+      </div>
+    </section>
+
+    <section class="investment" id="investment">
+      <h2>Gói Đầu Tư</h2>
+      <div class="investment-packages">
+        <div class="package">
+          <h3>Gói Cơ Bản</h3>
+          <div class="price">[Giá]</div>
+          <ul>
+            <li>✓ 5 con chồn</li>
+            <li>✓ Chu kỳ 6 tháng</li>
+            <li>✓ Giám sát qua app</li>
+            <li>✓ Báo cáo hàng tháng</li>
+            <li>✓ Lợi nhuận: [%]</li>
+          </ul>
+          <a href="#contact" class="cta-button">Đăng Ký</a>
+        </div>
+        <div class="package featured">
+          <h3>Gói Tiêu Chuẩn</h3>
+          <div class="price">[Giá]</div>
+          <ul>
+            <li>✓ 10 con chồn</li>
+            <li>✓ Chu kỳ 6 tháng</li>
+            <li>✓ Giám sát qua app</li>
+            <li>✓ Báo cáo hàng tuần</li>
+            <li>✓ Hỗ trợ ưu tiên</li>
+            <li>✓ Lợi nhuận: [%]</li>
+          </ul>
+          <a href="#contact" class="cta-button">Đăng Ký</a>
+        </div>
+        <div class="package">
+          <h3>Gói VIP</h3>
+          <div class="price">[Giá]</div>
+          <ul>
+            <li>✓ 20+ con chồn</li>
+            <li>✓ Chu kỳ linh hoạt</li>
+            <li>✓ Camera riêng 24/7</li>
+            <li>✓ Báo cáo theo yêu cầu</li>
+            <li>✓ Chuyên viên riêng</li>
+            <li>✓ Lợi nhuận: [%]</li>
+          </ul>
+          <a href="#contact" class="cta-button">Đăng Ký</a>
+        </div>
+      </div>
+    </section>
+
+    <section class="contact" id="contact">
+      <div class="contact-container">
+        <h2>Liên Hệ Đầu Tư</h2>
+        <div class="contact-form">
+          <form id="contact-form">
+            <div class="form-group">
+              <label>Họ và Tên</label>
+              <input
+                type="text"
+                name="hoTen"
+                placeholder="Nhập họ tên của bạn"
+                required
+              />
+            </div>
+            <div class="form-group">
+              <label>Số Điện Thoại</label>
+              <input
+                type="tel"
+                name="soDienThoai"
+                placeholder="Nhập số điện thoại"
+                required
+              />
+            </div>
+            <div class="form-group">
+              <label>Email</label>
+              <input
+                type="email"
+                name="email"
+                placeholder="Nhập email của bạn"
+                required
+              />
+            </div>
+            <div class="form-group">
+              <label>Gói Đầu Tư Quan Tâm</label>
+              <input
+                type="text"
+                name="goiDauTu"
+                placeholder="Cơ bản / Tiêu chuẩn / VIP"
+              />
+            </div>
+            <div class="form-group">
+              <label>Tin Nhắn (Không bắt buộc)</label>
+              <textarea
+                name="tinNhan"
+                placeholder="Để lại lời nhắn hoặc câu hỏi của bạn..."
+              ></textarea>
+            </div>
+            <button type="submit" class="cta-button">Gửi Thông Tin</button>
+            <div id="form-status"></div>
+          </form>
+        </div>
+      </div>
+    </section>
+
+    <footer>
+      <div class="footer-content">
+        <div class="footer-section">
+          <h3>Về Chúng Tôi</h3>
+          <p>
+            Trang trại chồn hiện đại với công nghệ giám sát từ xa, mang đến cơ
+            hội đầu tư an toàn và minh bạch.
+          </p>
+        </div>
+        <div class="footer-section">
+          <h3>Liên Kết</h3>
+          <ul>
+            <li><a href="#features">Ưu điểm</a></li>
+            <li><a href="#process">Quy trình</a></li>
+            <li><a href="#technology">Công nghệ</a></li>
+            <li><a href="#investment">Đầu tư</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-section">
+          <h3>Liên Hệ</h3>
+          <ul>
+            <li><i class="fas fa-fw fa-phone"></i> [Số điện thoại]</li>
+            <li><i class="fas fa-fw fa-envelope"></i> [Email]</li>
+            <li>
+              <i class="fas fa-fw fa-map-marker-alt"></i> [Địa chỉ trang trại]
+            </li>
+          </ul>
+        </div>
+        <div class="footer-section">
+          <h3>Giờ Làm Việc</h3>
+          <ul>
+            <li>Thứ 2 - Thứ 6: 8:00 - 18:00</li>
+            <li>Thứ 7: 8:00 - 12:00</li>
+            <li>Chủ nhật: Nghỉ</li>
+          </ul>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <p>&copy; 2025 Trang Trại Chồn Thông Minh. Bảo lưu mọi quyền.</p>
+      </div>
+    </footer>
+
+    <div id="image-popup">
+      <span id="popup-close">&times;</span>
+      <img id="popup-content" />
+    </div>
+
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+        const popup = document.getElementById("image-popup");
+        const popupImage = document.getElementById("popup-content");
+        const closeBtn = document.getElementById("popup-close");
+        const certCards = document.querySelectorAll(".cert-card");
+
+        certCards.forEach((card) => {
+          card.addEventListener("click", function () {
+            const imgSrc = this.getAttribute("data-img-src");
+            if (imgSrc) {
+              popupImage.src = imgSrc;
+              popup.style.display = "flex";
+            }
+          });
+        });
+
+        function closePopup() {
+          popup.style.display = "none";
+        }
+        closeBtn.addEventListener("click", closePopup);
+        popup.addEventListener("click", function (event) {
+          if (event.target === popup) {
+            closePopup();
+          }
+        });
       });
-    });
-  </script>
-</body>
+    </script>
+
+    <script>
+      const form = document.getElementById("contact-form");
+      const statusDiv = document.getElementById("form-status");
+
+      const scriptURL =
+        "https://script.google.com/macros/s/AKfycbzWKFUP-wTFzyPtMfI9uSmr0RsqW0gZDgPGtWdO0k6vq4QNGjMovbeNB0SWccEJB_8/exec";
+
+      form.addEventListener("submit", (e) => {
+        e.preventDefault();
+
+        statusDiv.textContent = "Đang gửi...";
+        statusDiv.style.color = "#333";
+
+        fetch(scriptURL, { method: "POST", body: new FormData(form) })
+          .then((response) => {
+            console.log("Success!", response);
+            statusDiv.textContent =
+              "Gửi thông tin thành công! Chúng tôi sẽ liên hệ với bạn sớm.";
+            statusDiv.style.color = "green";
+            form.reset();
+          })
+          .catch((error) => {
+            console.error("Error!", error.message);
+            statusDiv.textContent = "Đã có lỗi xảy ra. Vui lòng thử lại.";
+            statusDiv.style.color = "red";
+          });
+      });
+    </script>
+
+    <script>
+      // JavaScript để xử lý menu trên di động
+      const menuToggle = document.getElementById("mobile-menu-toggle");
+      const navLinks = document.getElementById("nav-links-menu");
+
+      // Khi nhấn vào nút hamburger
+      menuToggle.addEventListener("click", () => {
+        // Thêm hoặc xóa class 'show' để hiện hoặc ẩn menu
+        navLinks.classList.toggle("show");
+      });
+
+      // Tự động đóng menu khi nhấn vào một link (hữu ích cho trang đơn)
+      navLinks.addEventListener("click", (event) => {
+        if (event.target.tagName === "A") {
+          navLinks.classList.remove("show");
+        }
+      });
+    </script>
+  </body>
 </html>
