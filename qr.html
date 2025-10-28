@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trình Quét Mã Cây Trồng</title>
+    <!-- 1. Tải Tailwind CSS để làm đẹp -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- 2. Tải thư viện quét mã vạch -->
+    <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
+    <style>
+        /* Tùy chỉnh nhỏ */
+        #scanner-container {
+            width: 100%;
+            border: 2px solid #ccc;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        #result-container {
+            word-break: break-word; /* Chống vỡ layout */
+        }
+        .info-label {
+            @apply text-sm font-medium text-gray-500;
+        }
+        .info-value {
+            @apply text-lg font-semibold text-gray-900;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 min-h-screen flex items-center justify-center p-4 font-sans">
+
+    <div class="w-full max-w-md bg-white rounded-xl shadow-2xl p-6">
+        <h1 class="text-2xl font-bold text-center text-green-700 mb-4">Quản Lý Cây Trồng</h1>
+
+        <!-- VÙNG HIỂN THỊ CAMERA -->
+        <div id="scanner-section">
+            <div id="scanner-container" class="mb-4"></div>
+            <button id="btn-start-scan" class="w-full bg-green-600 text-white font-bold py-3 px-4 rounded-lg hover:bg-green-700 transition-all">
+                Bắt Đầu Quét
+            </button>
+        </div>
+
+        <!-- VÙNG HIỂN THỊ KẾT QUẢ -->
+        <div id="result-section" class="hidden">
+            
+            <!-- Trạng thái đang tải -->
+            <div id="loading-spinner" class="text-center my-4 hidden">
+                <div class="text-blue-600 font-medium">Đang tìm kiếm...</div>
+            </div>
+
+            <!-- Trạng thái lỗi -->
+            <div id="error-message" class="text-center my-4 p-3 bg-red-100 text-red-700 rounded-lg hidden">
+                <!-- Thông báo lỗi sẽ được chèn vào đây -->
+            </div>
+            
+            <!-- Thông tin cây -->
+            <div id="result-container" class="space-y-3">
+                <div>
+                    <div class="info-label">Mã Vạch Đã Quét</div>
+                    <div id="result-id" class="info-value text-blue-600"></div>
+                </div>
+                <hr>
+                <div>
+                    <div class="info-label">Mã Cây</div>
+                    <div id="result-ma-cay" class="info-value"></div>
+                </div>
+                <div>
+                    <div class="info-label">Tên Thường Gọi</div>
+                    <div id="result-ten" class="info-value"></div>
+                </div>
+                <div>
+                    <div class="info-label">Tên Khoa Học</div>
+                    <div id="result-ten-khoa-hoc" class="info-value"></div>
+                </div>
+                <div>
+                    <div class="info-label">Tình Trạng Sức Khỏe</div>
+                    <div id="result-tinh-trang" class="info-value"></div>
+                </div>
+                <div>
+                    <div class="info-label">Vị Trí (Lat, Long)</div>
+                    <div id="result-vi-tri" class="info-value"></div>
+                </div>
+                <div>
+                    <div class="info-label">Ngày Trồng</div>
+                    <div id="result-ngay-trong" class="info-value"></div>
+                </div>
+            </div>
+
+            <button id="btn-scan-again" class="w-full bg-gray-600 text-white font-bold py-3 px-4 rounded-lg hover:bg-gray-700 transition-all mt-6">
+                Quét Lại
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // !!! BƯỚC QUAN TRỌNG: Dán URL của Google Apps Script của bạn vào đây
+        const GAS_WEB_APP_URL = "YOUR_GAS_WEB_APP_URL_HERE"; 
+        // !!! (Bạn sẽ nhận được URL này ở Hướng dẫn - Bước 1.7)
+
+        // Lấy các phần tử DOM
+        const scannerSection = document.getElementById('scanner-section');
+        const resultSection = document.getElementById('result-section');
+        const btnStartScan = document.getElementById('btn-start-scan');
+        const btnScanAgain = document.getElementById('btn-scan-again');
+        
+        const loadingSpinner = document.getElementById('loading-spinner');
+        const errorMessage = document.getElementById('error-message');
+        const resultContainer = document.getElementById('result-container');
+
+        // Lấy các ô hiển thị kết quả
+        const resultId = document.getElementById('result-id');
+        const resultMaCay = document.getElementById('result-ma-cay');
+        const resultTen = document.getElementById('result-ten');
+        const resultTenKhoaHoc = document.getElementById('result-ten-khoa-hoc');
+        const resultTinhTrang = document.getElementById('result-tinh-trang');
+        const resultViTri = document.getElementById('result-vi-tri');
+        const resultNgayTrong = document.getElementById('result-ngay-trong');
+
+        // Khởi tạo đối tượng quét mã
+        const html5QrCode = new Html5Qrcode("scanner-container");
+
+        // Hàm gọi khi quét thành công
+        const onScanSuccess = (decodedText, decodedResult) => {
+            console.log(`Scan result: ${decodedText}`);
+            
+            // Dừng camera
+            html5QrCode.stop().catch(err => console.warn(err));
+
+            // Hiển thị phần kết quả, ẩn phần quét
+            scannerSection.classList.add('hidden');
+            resultSection.classList.remove('hidden');
+            resultContainer.classList.add('hidden'); // Ẩn kết quả cũ
+            errorMessage.classList.add('hidden'); // Ẩn lỗi cũ
+            loadingSpinner.classList.remove('hidden'); // Hiện vòng xoay
+
+            resultId.innerText = decodedText; // Hiển thị mã vừa quét
+            
+            // Gọi Google Sheet để lấy thông tin
+            fetchPlantData(decodedText);
+        };
+
+        // Hàm gọi khi quét thất bại (bỏ qua, vì nó quét liên tục)
+        const onScanFailure = (error) => {
+            // console.warn(`Scan error: ${error}`);
+        };
+
+        // Hàm tìm kiếm thông tin cây
+        async function fetchPlantData(plantId) {
+            // Xây dựng URL để gọi Google Apps Script, kèm theo tham số ?id=...
+            const url = `${GAS_WEB_APP_URL}?id=${encodeURIComponent(plantId)}`;
+
+            try {
+                const response = await fetch(url);
+                const data = await response.json();
+
+                // Ẩn vòng xoay
+                loadingSpinner.classList.add('hidden');
+
+                if (data.success) {
+                    // Tìm thấy cây
+                    const plant = data.plantData;
+                    
+                    // Điền thông tin vào các ô
+                    resultMaCay.innerText = plant.maCay;
+                    resultTen.innerText = plant.tenThuongGoi;
+                    resultTenKhoaHoc.innerText = plant.tenKhoaHoc;
+                    resultTinhTrang.innerText = plant.tinhTrang;
+                    resultViTri.innerText = plant.viTri;
+                    resultNgayTrong.innerText = plant.ngayTrong;
+                    
+                    // Hiện container kết quả
+                    resultContainer.classList.remove('hidden');
+
+                    // Thay đổi màu sắc tình trạng sức khỏe
+                    resultTinhTrang.classList.remove('text-green-600', 'text-yellow-600', 'text-red-600');
+                    if (plant.tinhTrang === "Tốt") {
+                        resultTinhTrang.classList.add('text-green-600');
+                    } else if (plant.tinhTrang === "Trung Bình") {
+                        resultTinhTrang.classList.add('text-yellow-600');
+                    } else { // Kém
+                        resultTinhTrang.classList.add('text-red-600');
+                    }
+
+                } else {
+                    // Không tìm thấy cây
+                    showError(`Không tìm thấy cây với Mã: ${plantId}`);
+                }
+            } catch (error) {
+                // Lỗi mạng hoặc lỗi hệ thống
+                console.error('Fetch Error:', error);
+                loadingSpinner.classList.add('hidden');
+                showError('Lỗi kết nối. Vui lòng thử lại.');
+            }
+        }
+
+        // Hàm hiển thị lỗi
+        function showError(message) {
+            errorMessage.innerText = message;
+            errorMessage.classList.remove('hidden');
+        }
+
+        // Hàm để bắt đầu quét
+        function startScanner() {
+            // Cấu hình quét: dùng camera sau (environment)
+            const config = { fps: 10, qrbox: { width: 250, height: 250 } };
+            
+            html5QrCode.start(
+                { facingMode: "environment" }, // Ưu tiên camera sau
+                config,
+                onScanSuccess,
+                onScanFailure
+            ).catch(err => {
+                console.error("Không thể khởi động camera", err);
+                showError("Không thể khởi động camera. Vui lòng cấp quyền.");
+                btnStartScan.classList.remove('hidden'); // Hiện lại nút
+            });
+        }
+        
+        // Gán sự kiện cho các nút
+        btnStartScan.addEventListener('click', () => {
+            btnStartScan.classList.add('hidden');
+            startScanner();
+        });
+
+        btnScanAgain.addEventListener('click', () => {
+            // Ẩn kết quả, hiện lại phần quét
+            resultSection.classList.add('hidden');
+            scannerSection.classList.remove('hidden');
+            btnStartScan.classList.add('hidden'); // Nút bắt đầu vẫn ẩn
+            
+            // Xóa kết quả cũ
+            resultContainer.classList.add('hidden');
+            errorMessage.classList.add('hidden');
+            
+            // Khởi động lại máy quét
+            startScanner();
+        });
+
+    </script>
+</body>
+</html>
