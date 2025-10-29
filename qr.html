@@ -20,10 +20,13 @@
             word-break: break-word; /* Chống vỡ layout */
         }
         .info-label {
-            @apply text-sm font-medium text-gray-500;
+            @apply block text-sm font-medium text-gray-700 mb-1;
+        }
+        .info-input {
+            @apply w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-green-500 focus:border-green-500 sm:text-sm;
         }
         .info-value {
-            @apply text-lg font-semibold text-gray-900;
+             @apply text-lg font-semibold text-gray-900;
         }
     </style>
 </head>
@@ -54,60 +57,81 @@
             </div>
             
             <!-- Thông tin cây -->
-            <div id="result-container" class="space-y-3">
+            <div id="result-container" class="space-y-4">
                 <div>
                     <div class="info-label">Mã Vạch Đã Quét</div>
                     <div id="result-id" class="info-value text-blue-600"></div>
                 </div>
                 <hr>
-                <div>
-                    <div class="info-label">Mã Cây</div>
-                    <div id="result-ma-cay" class="info-value"></div>
+                <!-- Mã Cây (không cho sửa) -->
+                 <div>
+                    <label class="info-label" for="result-ma-cay">Mã Cây</label>
+                    <input type="text" id="result-ma-cay" class="info-input bg-gray-100" readonly>
                 </div>
+                <!-- Tên Thường Gọi (cho sửa) -->
                 <div>
-                    <div class="info-label">Tên Thường Gọi</div>
-                    <div id="result-ten" class="info-value"></div>
+                    <label class="info-label" for="result-ten">Tên Thường Gọi</label>
+                    <input type="text" id="result-ten" class="info-input">
                 </div>
+                <!-- Tên Khoa Học (cho sửa) -->
                 <div>
-                    <div class="info-label">Tên Khoa Học</div>
-                    <div id="result-ten-khoa-hoc" class="info-value"></div>
+                    <label class="info-label" for="result-ten-khoa-hoc">Tên Khoa Học</label>
+                    <input type="text" id="result-ten-khoa-hoc" class="info-input">
                 </div>
+                <!-- Tình Trạng Sức Khỏe (cho sửa) -->
                 <div>
-                    <div class="info-label">Tình Trạng Sức Khỏe</div>
-                    <div id="result-tinh-trang" class="info-value"></div>
+                    <label class="info-label" for="result-tinh-trang">Tình Trạng Sức Khỏe</label>
+                    <select id="result-tinh-trang" class="info-input">
+                        <option value="Tốt">Tốt</option>
+                        <option value="Trung Bình">Trung Bình</option>
+                        <option value="Kém">Kém</option>
+                    </select>
                 </div>
+                <!-- Vị Trí (cho sửa) -->
                 <div>
-                    <div class="info-label">Vị Trí (Lat, Long)</div>
-                    <div id="result-vi-tri" class="info-value"></div>
+                    <label class="info-label" for="result-vi-tri">Vị Trí (Lat, Long)</label>
+                    <input type="text" id="result-vi-tri" class="info-input" placeholder="Ví dụ: 01/10/0279, 1057686">
                 </div>
+                <!-- Ngày Trồng (cho sửa) -->
                 <div>
-                    <div class="info-label">Ngày Trồng</div>
-                    <div id="result-ngay-trong" class="info-value"></div>
+                    <label class="info-label" for="result-ngay-trong">Ngày Trồng</label>
+                    <input type="text" id="result-ngay-trong" class="info-input" placeholder="Ví dụ: 15/01/2023">
                 </div>
             </div>
 
-            <button id="btn-scan-again" class="w-full bg-gray-600 text-white font-bold py-3 px-4 rounded-lg hover:bg-gray-700 transition-all mt-6">
-                Quét Lại
-            </button>
+            <!-- Trạng thái lưu -->
+            <div id="save-status" class="text-center my-4 p-3 rounded-lg hidden"></div>
+
+            <!-- Nút Lưu và Quét Lại -->
+            <div class="flex gap-4 mt-6">
+                <button id="btn-scan-again" class="w-1/2 bg-gray-600 text-white font-bold py-3 px-4 rounded-lg hover:bg-gray-700 transition-all">
+                    Quét Lại
+                </button>
+                 <button id="btn-save" class="w-1/2 bg-blue-600 text-white font-bold py-3 px-4 rounded-lg hover:bg-blue-700 transition-all">
+                    Lưu Thay Đổi
+                </button>
+            </div>
         </div>
     </div>
 
     <script>
         // !!! BƯỚC QUAN TRỌNG: Dán URL của Google Apps Script của bạn vào đây
         const GAS_WEB_APP_URL = "https://script.google.com/macros/s/AKfycbwCTzffRpPrWjaLXzh5lme9C1KoPiY4wII3uLYvMspiDcC5j8b7betKz0Lhv827N0D06g/exec"; 
-        // !!! (Bạn sẽ nhận được URL này ở Hướng dẫn - Bước 1.7)
+        // !!! (Giữ nguyên URL bạn đã dán)
 
         // Lấy các phần tử DOM
         const scannerSection = document.getElementById('scanner-section');
         const resultSection = document.getElementById('result-section');
         const btnStartScan = document.getElementById('btn-start-scan');
         const btnScanAgain = document.getElementById('btn-scan-again');
+        const btnSave = document.getElementById('btn-save'); // Nút Lưu mới
         
         const loadingSpinner = document.getElementById('loading-spinner');
         const errorMessage = document.getElementById('error-message');
+        const saveStatus = document.getElementById('save-status'); // Thông báo lưu
         const resultContainer = document.getElementById('result-container');
 
-        // Lấy các ô hiển thị kết quả
+        // Lấy các ô NHẬP LIỆU kết quả
         const resultId = document.getElementById('result-id');
         const resultMaCay = document.getElementById('result-ma-cay');
         const resultTen = document.getElementById('result-ten');
@@ -123,96 +147,132 @@
         const onScanSuccess = (decodedText, decodedResult) => {
             console.log(`Scan result: ${decodedText}`);
             
-            // Dừng camera
             html5QrCode.stop().catch(err => console.warn(err));
 
             // Hiển thị phần kết quả, ẩn phần quét
             scannerSection.classList.add('hidden');
             resultSection.classList.remove('hidden');
-            resultContainer.classList.add('hidden'); // Ẩn kết quả cũ
-            errorMessage.classList.add('hidden'); // Ẩn lỗi cũ
-            loadingSpinner.classList.remove('hidden'); // Hiện vòng xoay
+            resultContainer.classList.add('hidden'); 
+            errorMessage.classList.add('hidden');
+            saveStatus.classList.add('hidden'); // Ẩn thông báo lưu
+            loadingSpinner.classList.remove('hidden'); 
 
-            resultId.innerText = decodedText; // Hiển thị mã vừa quét
+            resultId.innerText = decodedText; 
             
             // Gọi Google Sheet để lấy thông tin
             fetchPlantData(decodedText);
         };
 
-        // Hàm gọi khi quét thất bại (bỏ qua, vì nó quét liên tục)
         const onScanFailure = (error) => {
             // console.warn(`Scan error: ${error}`);
         };
 
         // Hàm tìm kiếm thông tin cây
         async function fetchPlantData(plantId) {
-            // Xây dựng URL để gọi Google Apps Script, kèm theo tham số ?id=...
             const url = `${GAS_WEB_APP_URL}?id=${encodeURIComponent(plantId)}`;
 
             try {
                 const response = await fetch(url);
                 const data = await response.json();
-
-                // Ẩn vòng xoay
                 loadingSpinner.classList.add('hidden');
 
                 if (data.success) {
-                    // Tìm thấy cây
                     const plant = data.plantData;
                     
-                    // Điền thông tin vào các ô
-                    resultMaCay.innerText = plant.maCay;
-                    resultTen.innerText = plant.tenThuongGoi;
-                    resultTenKhoaHoc.innerText = plant.tenKhoaHoc;
-                    resultTinhTrang.innerText = plant.tinhTrang;
-                    resultViTri.innerText = plant.viTri;
-                    resultNgayTrong.innerText = plant.ngayTrong;
+                    // Điền thông tin vào các ô INPUT
+                    resultMaCay.value = plant.maCay; // Dùng .value
+                    resultTen.value = plant.tenThuongGoi;
+                    resultTenKhoaHoc.value = plant.tenKhoaHoc;
+                    resultTinhTrang.value = plant.tinhTrang; // Tự động chọn <option>
+                    resultViTri.value = plant.viTri;
+                    resultNgayTrong.value = plant.ngayTrong;
                     
-                    // Hiện container kết quả
                     resultContainer.classList.remove('hidden');
-
-                    // Thay đổi màu sắc tình trạng sức khỏe
-                    resultTinhTrang.classList.remove('text-green-600', 'text-yellow-600', 'text-red-600');
-                    if (plant.tinhTrang === "Tốt") {
-                        resultTinhTrang.classList.add('text-green-600');
-                    } else if (plant.tinhTrang === "Trung Bình") {
-                        resultTinhTrang.classList.add('text-yellow-600');
-                    } else { // Kém
-                        resultTinhTrang.classList.add('text-red-600');
-                    }
-
                 } else {
-                    // Không tìm thấy cây
                     showError(`Không tìm thấy cây với Mã: ${plantId}`);
                 }
             } catch (error) {
-                // Lỗi mạng hoặc lỗi hệ thống
                 console.error('Fetch Error:', error);
                 loadingSpinner.classList.add('hidden');
-                showError('Lỗi kết nối. Vui lòng thử lại.');
+                showError('Lỗi kết nối (GET). Vui lòng thử lại.');
             }
         }
 
-        // Hàm hiển thị lỗi
+        // *** HÀM MỚI: Lưu dữ liệu cây ***
+        async function savePlantData() {
+            // Hiện thông báo đang lưu
+            saveStatus.classList.remove('hidden', 'bg-red-100', 'text-red-700', 'bg-green-100', 'text-green-700');
+            saveStatus.classList.add('bg-blue-100', 'text-blue-700');
+            saveStatus.innerText = 'Đang lưu...';
+            
+            // Tạo đối tượng dữ liệu từ các ô input
+            const plantDataToSave = {
+                maCay: resultMaCay.value,
+                tenThuongGoi: resultTen.value,
+                tenKhoaHoc: resultTenKhoaHoc.value,
+                tinhTrang: resultTinhTrang.value,
+                viTri: resultViTri.value,
+                ngayTrong: resultNgayTrong.value
+            };
+
+            try {
+                // Gửi dữ liệu bằng phương thức POST
+                const response = await fetch(GAS_WEB_APP_URL, {
+                    method: 'POST',
+                    mode: 'cors', // Cần thiết cho POST
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        action: 'update',
+                        data: plantDataToSave
+                    })
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    // Thông báo lưu thành công
+                    saveStatus.classList.remove('bg-blue-100', 'text-blue-700');
+                    saveStatus.classList.add('bg-green-100', 'text-green-700');
+                    saveStatus.innerText = result.message; // 'Cập nhật thành công'
+                } else {
+                    // Thông báo lưu thất bại
+                    showSaveError(result.message);
+                }
+
+            } catch (error) {
+                console.error('Save Error:', error);
+                showSaveError('Lỗi kết nối (POST). Không thể lưu.');
+            }
+        }
+        
+        // Hàm hiển thị lỗi (khi fetch)
         function showError(message) {
             errorMessage.innerText = message;
             errorMessage.classList.remove('hidden');
         }
 
+        // Hàm hiển thị lỗi (khi save)
+        function showSaveError(message) {
+            saveStatus.classList.remove('bg-blue-100', 'text-blue-700');
+            saveStatus.classList.add('bg-red-100', 'text-red-700');
+            saveStatus.innerText = message;
+        }
+
         // Hàm để bắt đầu quét
         function startScanner() {
-            // Cấu hình quét: dùng camera sau (environment)
             const config = { fps: 10, qrbox: { width: 250, height: 250 } };
             
             html5QrCode.start(
-                { facingMode: "environment" }, // Ưu tiên camera sau
+                { facingMode: "environment" }, 
                 config,
                 onScanSuccess,
                 onScanFailure
             ).catch(err => {
                 console.error("Không thể khởi động camera", err);
                 showError("Không thể khởi động camera. Vui lòng cấp quyền.");
-                btnStartScan.classList.remove('hidden'); // Hiện lại nút
+                btnStartScan.classList.remove('hidden'); 
             });
         }
         
@@ -223,18 +283,17 @@
         });
 
         btnScanAgain.addEventListener('click', () => {
-            // Ẩn kết quả, hiện lại phần quét
             resultSection.classList.add('hidden');
             scannerSection.classList.remove('hidden');
-            btnStartScan.classList.add('hidden'); // Nút bắt đầu vẫn ẩn
-            
-            // Xóa kết quả cũ
+            btnStartScan.classList.add('hidden'); 
             resultContainer.classList.add('hidden');
             errorMessage.classList.add('hidden');
-            
-            // Khởi động lại máy quét
+            saveStatus.classList.add('hidden'); // Ẩn thông báo lưu
             startScanner();
         });
+        
+        // Gán sự kiện cho nút LƯU
+        btnSave.addEventListener('click', savePlantData);
 
     </script>
 </body>
