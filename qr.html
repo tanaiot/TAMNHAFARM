@@ -20,12 +20,15 @@
             word-break: break-word; /* Chống vỡ layout */
         }
         .info-label {
-            @apply block text-sm font-medium text-gray-700 mb-1;
+            /* THAY ĐỔI: Đã đổi từ font-medium sang font-bold */
+            @apply block text-sm font-bold text-gray-700 mb-1;
         }
         .info-input {
-            @apply w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-green-500 focus:border-green-500 sm:text-sm;
+            /* THAY ĐỔI: Thêm màu chữ (text-blue-800) và độ đậm (font-medium) */
+            @apply w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-green-500 focus:border-green-500 sm:text-sm text-blue-800 font-medium;
         }
         .info-value {
+             /* Đây là style cho "Mã Vạch Đã Quét" ở trên cùng */
              @apply text-lg font-semibold text-gray-900;
         }
     </style>
@@ -59,6 +62,7 @@
             <!-- Thông tin cây -->
             <div id="result-container" class="space-y-4">
                 <div>
+                    <!-- Nhãn này cũng sẽ được in đậm do thay đổi ở trên -->
                     <div class="info-label">Mã Vạch Đã Quét</div>
                     <div id="result-id" class="info-value text-blue-600"></div>
                 </div>
