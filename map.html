@@ -1,0 +1,549 @@
+<!DOCTYPE html>
+<html lang="vi">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Bản đồ và Quản lý Cây Trồng</title>
+
+    <link
+      rel="stylesheet"
+      href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+    />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
+
+    <style>
+      /* --- CSS GỐC TỪ MAP.HTML --- */
+      body {
+        margin: 0;
+        padding: 0;
+        font-family: Arial, sans-serif;
+      }
+
+      #info-panel {
+        padding: 20px;
+        background: #f1f1f1;
+        border-bottom: 1px solid #ccc;
+        text-align: center;
+      }
+
+      #map {
+        height: calc(
+          100vh - 150px
+        ); /* Điều chỉnh dựa trên chiều cao info-panel + toolbar */
+      }
+
+      .toolbar {
+        display: flex;
+        justify-content: center;
+        gap: 10px;
+        padding: 10px;
+        background: #f1f1f1;
+        border-bottom: 1px solid #ccc;
+      }
+
+      button {
+        background-color: #0078ff;
+        border: none;
+        color: white;
+        padding: 10px 18px;
+        border-radius: 6px;
+        font-size: 14px;
+        cursor: pointer;
+      }
+
+      button:hover {
+        background-color: #005ecb;
+      }
+
+      button.back-button {
+        background-color: #6c757d;
+      }
+      button.back-button:hover {
+        background-color: #5a6268;
+      }
+
+      /* --- CSS MỚI CHO MODAL --- */
+
+      /* Lớp phủ nền mờ */
+      #scanner-modal-overlay {
+        display: none; /* Ẩn mặc định */
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.6);
+        z-index: 1000;
+        /* Sử dụng flex để căn giữa */
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 1rem;
+      }
+
+      /* Tùy chỉnh cho nội dung modal từ Tailwind */
+      /* Chúng ta cần định nghĩa các lớp @apply ở đây vì nó nằm ngoài context của Tailwind */
+      .info-label {
+        display: block;
+        font-size: 0.875rem; /* text-sm */
+        font-weight: 700; /* font-bold */
+        color: #374151; /* text-gray-700 */
+        margin-bottom: 0.25rem; /* mb-1 */
+      }
+      .info-input {
+        width: 100%;
+        padding-left: 0.75rem;
+        padding-right: 0.75rem;
+        padding-top: 0.5rem;
+        padding-bottom: 0.5rem;
+        border: 1px solid #d1d5db; /* border-gray-300 */
+        border-radius: 0.375rem; /* rounded-md */
+        box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05); /* shadow-sm */
+        font-size: 0.875rem; /* sm:text-sm */
+        color: #1e40af; /* text-blue-800 */
+        font-weight: 500; /* font-medium */
+      }
+      .info-input:focus {
+        outline: none;
+        box-shadow: 0 0 0 2px #22c55e; /* focus:ring-green-500 */
+        border-color: #22c55e; /* focus:border-green-500 */
+      }
+      .info-value {
+        font-size: 1.125rem; /* text-lg */
+        font-weight: 600; /* font-semibold */
+        color: #111827; /* text-gray-900 */
+      }
+    </style>
+  </head>
+  <body>
+    <div id="info-panel">
+      <h2>Chưa có thông tin cây khi chưa quét từ barcode</h2>
+      <div id="plant-info"></div>
+    </div>
+
+    <div class="toolbar">
+      <button onclick="window.location.href='index.html'" class="back-button">
+        Quay lại Trang Chủ
+      </button>
+      <button onclick="openScannerModal()">Quét và Cập Nhật Cây</button>
+    </div>
+
+    <div id="map"></div>
+
+    <div id="scanner-modal-overlay" class="hidden">
+      <div class="w-full max-w-md bg-white rounded-xl shadow-2xl p-6 relative">
+        <button
+          onclick="closeScannerModal()"
+          class="absolute top-2 right-2 text-gray-500 hover:text-gray-800"
+          style="background: none; padding: 5px"
+        >
+          <svg
+            class="w-6 h-6"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M6 18L18 6M6 6l12 12"
+            ></path>
+          </svg>
+        </button>
+
+        <h1 class="text-2xl font-bold text-center text-green-700 mb-4">
+          Quản Lý Cây Trồng
+        </h1>
+
+        <div id="scanner-section">
+          <div
+            id="scanner-container"
+            class="mb-4 w-full border-2 border-gray-300 rounded-lg overflow-hidden"
+          ></div>
+          <button
+            id="btn-start-scan"
+            class="w-full bg-green-600 text-white font-bold py-3 px-4 rounded-lg hover:bg-green-700 transition-all"
+          >
+            Bắt Đầu Quét
+          </button>
+        </div>
+
+        <div id="result-section" class="hidden">
+          <div id="loading-spinner" class="text-center my-4 hidden">
+            <div class="text-blue-600 font-medium">Đang tìm kiếm...</div>
+          </div>
+
+          <div
+            id="error-message"
+            class="text-center my-4 p-3 bg-red-100 text-red-700 rounded-lg hidden"
+          ></div>
+
+          <div id="result-container" class="space-y-4">
+            <div>
+              <div class="info-label">Mã Vạch Đã Quét</div>
+              <div id="result-id" class="info-value text-blue-600"></div>
+            </div>
+            <hr />
+            <div>
+              <label class="info-label" for="result-ma-cay">Mã Cây</label>
+              <input
+                type="text"
+                id="result-ma-cay"
+                class="info-input bg-gray-100"
+                readonly
+              />
+            </div>
+            <div>
+              <label class="info-label" for="result-ten">Tên Thường Gọi</label>
+              <input type="text" id="result-ten" class="info-input" />
+            </div>
+            <div>
+              <label class="info-label" for="result-ten-khoa-hoc"
+                >Tên Khoa Học</label
+              >
+              <input type="text" id="result-ten-khoa-hoc" class="info-input" />
+            </div>
+            <div>
+              <label class="info-label" for="result-tinh-trang"
+                >Tình Trạng Sức Khỏe</label
+              >
+              <select id="result-tinh-trang" class="info-input">
+                <option value="Tốt">Tốt</option>
+                <option value="Trung Bình">Trung Bình</option>
+                <option value="Kém">Kém</option>
+              </select>
+            </div>
+            <div>
+              <label class="info-label" for="result-vi-tri"
+                >Vị Trí (Lat, Long)</label
+              >
+              <input
+                type="text"
+                id="result-vi-tri"
+                class="info-input"
+                placeholder="Ví dụ: 01/10/0279, 1057686"
+              />
+            </div>
+            <div>
+              <label class="info-label" for="result-ngay-trong"
+                >Ngày Trồng</label
+              >
+              <input
+                type="text"
+                id="result-ngay-trong"
+                class="info-input"
+                placeholder="Ví dụ: 15/01/2023"
+              />
+            </div>
+          </div>
+
+          <div
+            id="save-status"
+            class="text-center my-4 p-3 rounded-lg hidden"
+          ></div>
+
+          <div class="flex gap-4 mt-6">
+            <button
+              id="btn-scan-again"
+              class="w-1/2 bg-gray-600 text-white font-bold py-3 px-4 rounded-lg hover:bg-gray-700 transition-all"
+            >
+              Quét Lại
+            </button>
+            <button
+              id="btn-save"
+              class="w-1/2 bg-blue-600 text-white font-bold py-3 px-4 rounded-lg hover:bg-blue-700 transition-all"
+            >
+              Lưu Thay Đổi
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      // --- PHẦN 1: KHỞI TẠO BẢN ĐỒ (Từ map.html) ---
+      const map = L.map("map", {
+        center: [10.122241670031254, 105.91019045369704],
+        zoom: 22,
+        minZoom: 15,
+        maxZoom: 22,
+      });
+
+      L.tileLayer("map2/odm_orthophoto/odm_tiles/{z}/{x}/{y}.png", {
+        maxZoom: 22,
+        minZoom: 15,
+        attribution: "Bản đồ © TamNhaFarm",
+        tms: true,
+      }).addTo(map);
+
+      // --- PHẦN 2: KHAI BÁO BIẾN (Gộp từ 2 file) ---
+
+      // !!! QUAN TRỌNG: Dán URL Google Apps Script của bạn vào đây
+      // (Lấy từ file thứ 2, file này hỗ trợ cả GET và POST)
+      const GAS_WEB_APP_URL =
+        "https://script.google.com/macros/s/AKfycbwCTzffRpPrWjaLXzh5lme9C1KoPiY4wII3uLYvMspiDcC5j8b7betKz0Lhv827N0D06g/exec";
+
+      // Khởi tạo đối tượng quét mã
+      const html5QrCode = new Html5Qrcode("scanner-container");
+
+      // Lấy các phần tử DOM của Modal
+      const modalOverlay = document.getElementById("scanner-modal-overlay");
+      const scannerSection = document.getElementById("scanner-section");
+      const resultSection = document.getElementById("result-section");
+      const btnStartScan = document.getElementById("btn-start-scan");
+      const btnScanAgain = document.getElementById("btn-scan-again");
+      const btnSave = document.getElementById("btn-save");
+
+      const loadingSpinner = document.getElementById("loading-spinner");
+      const errorMessage = document.getElementById("error-message");
+      const saveStatus = document.getElementById("save-status");
+      const resultContainer = document.getElementById("result-container");
+
+      // Lấy các ô NHẬP LIỆU kết quả
+      const resultId = document.getElementById("result-id");
+      const resultMaCay = document.getElementById("result-ma-cay");
+      const resultTen = document.getElementById("result-ten");
+      const resultTenKhoaHoc = document.getElementById("result-ten-khoa-hoc");
+      const resultTinhTrang = document.getElementById("result-tinh-trang");
+      const resultViTri = document.getElementById("result-vi-tri");
+      const resultNgayTrong = document.getElementById("result-ngay-trong");
+
+      // --- PHẦN 3: HÀM ĐIỀU KHIỂN MODAL & SCANNER ---
+
+      function openScannerModal() {
+        modalOverlay.classList.remove("hidden");
+        // Reset về màn hình quét
+        scannerSection.classList.remove("hidden");
+        resultSection.classList.add("hidden");
+        btnStartScan.classList.remove("hidden");
+      }
+
+      function closeScannerModal() {
+        modalOverlay.classList.add("hidden");
+        // Dừng camera khi đóng
+        html5QrCode
+          .stop()
+          .catch((err) => console.warn("Scanner already stopped."));
+      }
+
+      function startScanner() {
+        const config = { fps: 10, qrbox: { width: 250, height: 250 } };
+        html5QrCode
+          .start(
+            { facingMode: "environment" },
+            config,
+            onScanSuccess,
+            onScanFailure
+          )
+          .catch((err) => {
+            console.error("Không thể khởi động camera", err);
+            showError("Không thể khởi động camera. Vui lòng cấp quyền.");
+            btnStartScan.classList.remove("hidden");
+          });
+      }
+
+      // Hàm gọi khi quét thành công
+      const onScanSuccess = (decodedText, decodedResult) => {
+        console.log(`Scan result: ${decodedText}`);
+
+        html5QrCode
+          .stop()
+          .catch((err) => console.warn("Error stopping scanner:", err));
+
+        // Hiển thị phần kết quả, ẩn phần quét
+        scannerSection.classList.add("hidden");
+        resultSection.classList.remove("hidden");
+        resultContainer.classList.add("hidden");
+        errorMessage.classList.add("hidden");
+        saveStatus.classList.add("hidden");
+        loadingSpinner.classList.remove("hidden");
+
+        resultId.innerText = decodedText;
+
+        // Gọi Google Sheet để lấy thông tin
+        fetchPlantData(decodedText);
+      };
+
+      const onScanFailure = (error) => {
+        // console.warn(`Scan error: ${error}`);
+      };
+
+      // --- PHẦN 4: HÀM XỬ LÝ DỮ LIỆU (GỘP) ---
+
+      // Hàm tìm kiếm thông tin cây
+      async function fetchPlantData(plantId) {
+        const url = `${GAS_WEB_APP_URL}?id=${encodeURIComponent(plantId)}`;
+
+        try {
+          const response = await fetch(url);
+          const data = await response.json();
+          loadingSpinner.classList.add("hidden");
+
+          if (data.success) {
+            const plant = data.plantData;
+
+            // 1. Điền thông tin vào các ô INPUT trong MODAL (từ file 2)
+            resultMaCay.value = plant.maCay;
+            resultTen.value = plant.tenThuongGoi;
+            resultTenKhoaHoc.value = plant.tenKhoaHoc;
+            resultTinhTrang.value = plant.tinhTrang;
+            resultViTri.value = plant.viTri;
+            resultNgayTrong.value = plant.ngayTrong;
+
+            resultContainer.classList.remove("hidden");
+
+            // 2. *** GỘP: Cập nhật Info Panel (từ map.html) ***
+            displayPlantInfo(plant);
+
+            // 3. *** GỘP: Zoom đến vị trí (từ map.html) ***
+            zoomToPlantLocation(plant.viTri);
+          } else {
+            showError(`Không tìm thấy cây với Mã: ${plantId}`);
+            // Xóa thông tin cũ trên info panel nếu không tìm thấy
+            document.getElementById("plant-info").innerHTML = "";
+            document.querySelector("#info-panel h2").textContent =
+              "Không tìm thấy cây";
+          }
+        } catch (error) {
+          console.error("Fetch Error:", error);
+          loadingSpinner.classList.add("hidden");
+          showError("Lỗi kết nối (GET). Vui lòng thử lại.");
+        }
+      }
+
+      // Hàm lưu dữ liệu (từ file 2)
+      async function savePlantData() {
+        saveStatus.classList.remove(
+          "hidden",
+          "bg-red-100",
+          "text-red-700",
+          "bg-green-100",
+          "text-green-700"
+        );
+        saveStatus.classList.add("bg-blue-100", "text-blue-700");
+        saveStatus.innerText = "Đang lưu...";
+
+        const plantDataToSave = {
+          maCay: resultMaCay.value,
+          tenThuongGoi: resultTen.value,
+          tenKhoaHoc: resultTenKhoaHoc.value,
+          tinhTrang: resultTinhTrang.value,
+          viTri: resultViTri.value,
+          ngayTrong: resultNgayTrong.value,
+        };
+
+        try {
+          const response = await fetch(GAS_WEB_APP_URL, {
+            method: "POST",
+            mode: "cors",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              action: "update",
+              data: plantDataToSave,
+            }),
+          });
+
+          const result = await response.json();
+
+          if (result.success) {
+            saveStatus.classList.remove("bg-blue-100", "text-blue-700");
+            saveStatus.classList.add("bg-green-100", "text-green-700");
+            saveStatus.innerText = result.message; // 'Cập nhật thành công'
+
+            // *** GỘP: Cập nhật lại Info Panel trên map ngay sau khi lưu ***
+            displayPlantInfo(plantDataToSave);
+          } else {
+            showSaveError(result.message);
+          }
+        } catch (error) {
+          console.error("Save Error:", error);
+          showSaveError("Lỗi kết nối (POST). Không thể lưu.");
+        }
+      }
+
+      // --- PHẦN 5: HÀM HIỂN THỊ (Gộp) ---
+
+      // Hàm hiển thị thông tin lên Info Panel (từ map.html)
+      function displayPlantInfo(plantData) {
+        const infoDiv = document.getElementById("plant-info");
+        infoDiv.innerHTML = `
+          <p><strong>Mã Cây:</strong> ${plantData.maCay}</p>
+          <p><strong>Tên Thường Gọi:</strong> ${plantData.tenThuongGoi}</p>
+          <p><strong>Tình Trạng Sức Khỏe:</strong> ${plantData.tinhTrang}</p>
+          <p><strong>Vị Trí:</strong> ${plantData.viTri}</p>
+        `;
+        document.querySelector("#info-panel h2").textContent =
+          "Thông tin cây vừa quét:";
+      }
+
+      // Hàm zoom bản đồ (từ map.html)
+      function zoomToPlantLocation(viTri) {
+        // Xử lý tọa độ có dạng "01/10/0279, 1057686"
+        try {
+          const [latStr, longStr] = viTri.split(",").map((s) => s.trim());
+
+          // Parse lat (ví dụ: "01/10/0279" → 10.0279)
+          const latClean = latStr.replace("01/", "").replace("/", ".");
+          const lat = parseFloat(latClean);
+
+          // Parse long (ví dụ: "1057686" → 105.7686)
+          const long = parseFloat(longStr.slice(0, 3) + "." + longStr.slice(3));
+
+          if (!isNaN(lat) && !isNaN(long)) {
+            map.setView([lat, long], 22); // Zoom tối đa đến vị trí
+            // Đặt một Marker (tùy chọn)
+            L.marker([lat, long])
+              .addTo(map)
+              .bindPopup("Vị trí cây")
+              .openPopup();
+          } else {
+            console.error("Tọa độ không hợp lệ:", viTri);
+            alert("Tọa độ trong dữ liệu không hợp lệ.");
+          }
+        } catch (e) {
+          console.error("Lỗi xử lý tọa độ:", e);
+          alert("Dữ liệu vị trí bị lỗi, không thể zoom.");
+        }
+      }
+
+      // Hàm hiển thị lỗi (từ file 2)
+      function showError(message) {
+        errorMessage.innerText = message;
+        errorMessage.classList.remove("hidden");
+      }
+
+      function showSaveError(message) {
+        saveStatus.classList.remove("bg-blue-100", "text-blue-700");
+        saveStatus.classList.add("bg-red-100", "text-red-700");
+        saveStatus.innerText = message;
+      }
+
+      // --- PHẦN 6: GÁN SỰ KIỆN CHO CÁC NÚT (từ file 2) ---
+
+      btnStartScan.addEventListener("click", () => {
+        btnStartScan.classList.add("hidden");
+        startScanner();
+      });
+
+      btnScanAgain.addEventListener("click", () => {
+        resultSection.classList.add("hidden");
+        scannerSection.classList.remove("hidden");
+        btnStartScan.classList.add("hidden");
+        resultContainer.classList.add("hidden");
+        errorMessage.classList.add("hidden");
+        saveStatus.classList.add("hidden");
+        startScanner();
+      });
+
+      btnSave.addEventListener("click", savePlantData);
+    </script>
+  </body>
+</html>
