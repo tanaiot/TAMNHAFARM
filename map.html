@@ -327,7 +327,7 @@
         try {
           const response = await fetch(GAS_WEB_APP_URL, {
             method: "POST",
-            mode: "cors",
+            mode: "no-cors",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ action: "update", data: plantDataToSave }),
           });
@@ -399,6 +399,7 @@
     </script>
   </body>
 </html>
+
 
 
 
