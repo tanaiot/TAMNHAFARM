@@ -331,14 +331,13 @@
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ action: "update", data: plantDataToSave }),
           });
-          const result = await response.json();
-          if (result.success) {
+         
+          // Với no-cors, không đọc được json() -> giả định thành công
             saveStatus.classList.remove("bg-blue-100", "text-blue-700");
             saveStatus.classList.add("bg-green-100", "text-green-700");
-            saveStatus.innerText = result.message;
-          } else {
-            showSaveError(result.message);
-          }
+            saveStatus.innerText = "Lưu thành công!";
+          // Tùy chọn: Refresh data sau lưu
+            fetchPlantData(resultId.innerText);
         } catch (error) {
           console.error("Save Error:", error);
           showSaveError("Lỗi kết nối (POST). Không thể lưu.");
@@ -399,6 +398,7 @@
     </script>
   </body>
 </html>
+
 
 
 
