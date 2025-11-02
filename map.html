@@ -327,17 +327,18 @@
         try {
           const response = await fetch(GAS_WEB_APP_URL, {
             method: "POST",
-            mode: "no-cors",
+            mode: "cors",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ action: "update", data: plantDataToSave }),
           });
-         
-          // Với no-cors, không đọc được json() -> giả định thành công
+         const result = await response.json();
+          if (result.success) {
             saveStatus.classList.remove("bg-blue-100", "text-blue-700");
             saveStatus.classList.add("bg-green-100", "text-green-700");
-            saveStatus.innerText = "Lưu thành công!";
-          // Tùy chọn: Refresh data sau lưu
-            fetchPlantData(resultId.innerText);
+            saveStatus.innerText = result.message;
+          } else {
+            showSaveError(result.message);
+          }
         } catch (error) {
           console.error("Save Error:", error);
           showSaveError("Lỗi kết nối (POST). Không thể lưu.");
