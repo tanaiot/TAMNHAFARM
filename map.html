@@ -16,7 +16,6 @@
     <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
 
     <style>
-      /* --- CSS MỚI CHO BỐ CỤC Top-Bottom --- */
       html,
       body {
         margin: 0;
@@ -30,16 +29,16 @@
 
       #scanner-panel {
         flex-shrink: 0;
-        padding: 1rem; /* Giảm padding tổng của panel */
+        padding: 1rem;
         background-color: white;
         box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
         overflow-y: auto;
-        max-height: 45vh; /* Giữ nguyên 40% */
+        max-height: 45vh;
       }
 
       #map-container {
         flex-grow: 1;
-        min-height: 55vh; /* Giữ nguyên 60% */
+        min-height: 55vh;
       }
 
       #map {
@@ -47,27 +46,21 @@
         width: 100%;
       }
 
-      /* --- CSS CHO FORM (ĐÃ ĐIỀU CHỈNH) --- */
+      /* --- CSS CHO FORM (ĐÃ SỬA LẠI CỠ CHỮ HỢP LÝ) --- */
       .info-label {
         display: block;
-        /* === THAY ĐỔI: Giảm cỡ chữ label === */
-        font-size: 0.45rem; /* 12px (từ 14px) */
+        font-size: 0.75rem; /* 12px (Sửa từ 0.45rem) */
         font-weight: 700;
         color: #374151;
         margin-bottom: 0.25rem;
       }
       .info-input {
         width: 100%;
-        /* === THAY ĐỔI: Giảm padding input === */
-        padding-left: 0.2rem; /* 8px */
-        padding-right: 0.2rem; /* 8px */
-        padding-top: 0.175rem; /* 6px (từ 8px) */
-        padding-bottom: 0.275rem; /* 6px (từ 8px) */
+        padding: 0.375rem 0.5rem; /* 6px 8px */
         border: 1px solid #d1d5db;
         border-radius: 0.375rem;
         box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-        /* === THAY ĐỔI: Giảm cỡ chữ input === */
-        font-size: 0.4125rem; /* 13px (từ 14px) */
+        font-size: 0.875rem; /* 14px (Sửa từ 0.4125rem) */
         color: #1e40af;
         font-weight: 500;
       }
@@ -77,8 +70,7 @@
         border-color: #22c55e;
       }
       .info-value {
-        /* === THAY ĐỔI: Giảm cỡ chữ kết quả quét === */
-        font-size: 0.5rem; /* 16px (từ 18px) */
+        font-size: 1rem; /* 16px (Sửa từ 0.5rem) */
         font-weight: 600;
         color: #111827;
       }
@@ -202,6 +194,7 @@
     <div id="map-container">
       <div id="map"></div>
     </div>
+    
     <script>
       // --- PHẦN 1: KHỞI TẠO BẢN ĐỒ ---
       const map = L.map("map", {
@@ -223,8 +216,9 @@
       ).addTo(map);
 
       // --- PHẦN 2: KHAI BÁO BIẾN ---
+      // *** Giữ nguyên URL mới nhất của bạn ***
       const GAS_WEB_APP_URL =
-        "https://script.google.com/macros/s/AKfycbwCTzffRpPrWjaLXzh5lme9C1KoPiY4wII3uLYvMspiDcC5j8b7betKz0Lhv827N0D06g/exec";
+        "https://script.google.com/macros/s/AKfycbwW_tbNknCRXl686KqF039_pV7OSqpefgXJpoQqy9MhBfC7UlprIAQ6dFjzChFsT56y_Q/exec";
       const html5QrCode = new Html5Qrcode("scanner-container");
       const scannerSection = document.getElementById("scanner-section");
       const resultSection = document.getElementById("result-section");
@@ -331,7 +325,7 @@
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ action: "update", data: plantDataToSave }),
           });
-         const result = await response.json();
+          const result = await response.json();
           if (result.success) {
             saveStatus.classList.remove("bg-blue-100", "text-blue-700");
             saveStatus.classList.add("bg-green-100", "text-green-700");
@@ -399,9 +393,3 @@
     </script>
   </body>
 </html>
-
-
-
-
-
-
