@@ -20,15 +20,42 @@
         box-sizing: border-box;
       }
 
+      html {
+        font-size: 14px;
+        scrollbar-width: thin;
+        scrollbar-color: #bdbdbd #f1f1f1;
+        scroll-behavior: smooth;
+      }
+
       body {
         font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
         line-height: 1.6;
         color: #333;
       }
+      /* BẮT ĐẦU HIỆU CHỈNH CHO THANH CUỘN */
+      body::-webkit-scrollbar {
+        width: 10px;
+      }
 
-      /* Header */
+      body::-webkit-scrollbar-track {
+        background: #f1f1f1; /* Màu nền của rãnh cuộn */
+        border-radius: 20px;
+      }
+
+      body::-webkit-scrollbar-thumb {
+        background-color: #a0a0a0; /* Màu của con trượt */
+        border-radius: 20px; /* Bo góc con trượt */
+        border: 2px solid #f1f1f1; /* Tạo khoảng cách giữa con trượt và rãnh */
+      }
+
+      body::-webkit-scrollbar-thumb:hover {
+        background-color: #888; /* Màu con trượt khi di chuột vào */
+      }
+      /* --- KẾT THÚC TÙY CHỈNH THANH CUỘN --- */
+
+      /* HIỆU CHỈNH CHO Header */
       header {
-        background: linear-gradient(135deg, #099204 0%, #099623 100%);
+        background: #06b626;
         color: white;
         position: fixed;
         width: 100%;
@@ -44,7 +71,7 @@
         align-items: center;
         justify-content: space-between;
         padding: 0.5rem 2rem;
-        height: 150px;
+        height: 10%;
       }
 
       .logo-container {
@@ -71,6 +98,8 @@
         display: flex;
         gap: 2rem;
         list-style: none;
+        top: 20px;
+        left: 0;
       }
 
       .nav-links a {
@@ -80,27 +109,28 @@
       }
 
       .nav-links a:hover {
-        color: #3498db;
+        color: rgb(6, 243, 152);
       }
-
+      /*THANH MENU Ở MÀN HÌNH MOBILE*/
       .mobile-menu-icon {
-        display: none; /* Mặc định ẩn trên màn hình lớn */
+        display: none;
         background: none;
         border: none;
         color: white;
         font-size: 1.6rem;
         cursor: pointer;
-        z-index: 1100; /* Đảm bảo nút luôn ở trên cùng */
+        z-index: 1100;
       }
 
       /* Hero Section */
       .hero {
+        height: 60vh;
         position: relative;
         overflow: hidden;
         color: white;
         padding: 150px 2rem 100px;
         text-align: center;
-        margin-top: 80px; /* Bằng chiều cao của header */
+        margin-top: 93px;
       }
 
       #hero-video {
@@ -123,7 +153,7 @@
         left: 0;
         width: 100%;
         height: 100%;
-        background: rgba(0, 0, 0, 0.5);
+        background: rgba(0, 0, 0, 0.25);
         z-index: 0;
       }
 
@@ -133,35 +163,73 @@
       }
 
       .hero h1 {
-        font-size: 3rem;
+        font-size: 2.5rem;
         margin-bottom: 1rem;
         animation: fadeInUp 1s;
       }
 
       .hero p {
-        font-size: 1.3rem;
+        font-size: 1.1rem; /* (Đã giảm) */
         margin-bottom: 2rem;
         animation: fadeInUp 1s 0.2s both;
       }
 
+      @keyframes wave {
+        0% {
+          border-radius: 50% 50% 0 0;
+        }
+        25% {
+          border-radius: 40% 60% 0 0;
+        }
+        50% {
+          border-radius: 60% 40% 0 0;
+        }
+        75% {
+          border-radius: 45% 55% 0 0;
+        }
+        100% {
+          border-radius: 50% 50% 0 0;
+        }
+      }
+      /* Hiệu ứng nút CTA Liquid */
       .cta-button {
-        background: #099204;
-        color: white;
         padding: 15px 40px;
-        border: none;
         border-radius: 50px;
         font-size: 1.1rem;
         cursor: pointer;
-        transition: all 0.3s;
-        animation: fadeInUp 1s 0.4s both;
         text-decoration: none;
         display: inline-block;
+        position: relative;
+        overflow: hidden;
+        background: white;
+        color: #099204;
+        border: 2px solid #099204;
+        transition: all 0.5s ease;
+        animation: none;
+        z-index: 1;
       }
 
       .cta-button:hover {
-        background: #066403;
-        transform: translateY(-3px);
-        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+        color: white;
+        transform: none;
+        box-shadow: none;
+      }
+      .cta-button::before {
+        content: "";
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        height: 0;
+        transition: height 0.5s ease;
+        background: #099204;
+        border-radius: 50% 50% 0 0;
+        z-index: -1;
+      }
+
+      .cta-button:hover::before {
+        height: 180%;
+        animation: wave 0.8s ease-in-out;
       }
 
       /* Features Section */
@@ -173,7 +241,7 @@
 
       .features h2 {
         text-align: center;
-        font-size: 2.5rem;
+        font-size: 2rem;
         margin-bottom: 3rem;
         color: #2c3e50;
       }
@@ -185,17 +253,17 @@
       }
 
       .feature-card {
-        background: white;
+        background: rgb(255, 255, 255);
         padding: 2rem;
-        border-radius: 15px;
-        box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+        border-radius: 40px 0px;
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
         transition: transform 0.3s, box-shadow 0.3s;
         text-align: center;
       }
 
       .feature-card:hover {
         transform: translateY(-10px);
-        box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
+        box-shadow: 0 20px 30px rgba(0, 0, 0, 0.2);
       }
 
       .feature-icon {
@@ -204,10 +272,20 @@
         color: #099204;
       }
 
+      .feature-icon .custom-icon-gif {
+        width: 60px;
+        height: 60px;
+        object-fit: contain;
+      }
       .feature-card h3 {
         color: #2c3e50;
         margin-bottom: 1rem;
         font-size: 1.5rem;
+      }
+
+      /* CSS cho Nút trượt (mặc định ẩn) */
+      .scroll-btn {
+        display: none;
       }
 
       /* Process Section */
@@ -223,7 +301,7 @@
 
       .process h2 {
         text-align: center;
-        font-size: 2.5rem;
+        font-size: 2rem;
         margin-bottom: 3rem;
         color: #2c3e50;
       }
@@ -237,7 +315,7 @@
       .step {
         background: white;
         padding: 2rem;
-        border-radius: 15px;
+        border-radius: 0px 40px;
         position: relative;
         box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
       }
@@ -256,6 +334,7 @@
         justify-content: center;
         font-size: 1.5rem;
         font-weight: bold;
+        z-index: 1;
       }
 
       .step h3 {
@@ -273,7 +352,7 @@
 
       .technology h2 {
         text-align: center;
-        font-size: 2.5rem;
+        font-size: 2rem;
         margin-bottom: 3rem;
         color: #2c3e50;
       }
@@ -352,7 +431,7 @@
       }
 
       .certification h2 {
-        font-size: 2.5rem;
+        font-size: 2rem;
         margin-bottom: 2rem;
       }
 
@@ -395,7 +474,7 @@
 
       .investment h2 {
         text-align: center;
-        font-size: 2.5rem;
+        font-size: 2rem;
         margin-bottom: 3rem;
         color: #2c3e50;
       }
@@ -421,19 +500,20 @@
         box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
       }
 
+      /* ĐỔI MÀU VIỀN FEATURED THEO YÊU CẦU MỚI */
       .package.featured {
-        border-color: #16a103;
+        border-color: #16a103; /* Màu xanh lá */
         transform: scale(1.05);
       }
 
       .package h3 {
         color: #2c3e50;
-        font-size: 1.8rem;
+        font-size: 1.5rem;
         margin-bottom: 1rem;
       }
 
       .package .price {
-        font-size: 2.5rem;
+        font-size: 2rem;
         color: #667eea;
         font-weight: bold;
         margin: 1rem 0;
@@ -461,7 +541,7 @@
       }
 
       .contact h2 {
-        font-size: 2.5rem;
+        font-size: 2rem;
         margin-bottom: 2rem;
         color: #2c3e50;
       }
@@ -622,7 +702,7 @@
         margin-top: 1rem;
         font-weight: bold;
       }
-
+      /* === BẮT ĐẦU CSS CHO DI ĐỘNG === */
       @media (max-width: 768px) {
         .hero h1 {
           font-size: 2rem;
@@ -632,39 +712,185 @@
           grid-template-columns: 1fr;
         }
 
-        /* --- Bắt đầu phần CSS cho menu di động --- */
+        /* --- Bắt đầu phần CSS cho menu di động CÓ ANIMATION --- */
 
         .mobile-menu-icon {
           display: block; /* Hiện nút hamburger trên di động */
         }
 
         .nav-links {
-          /* Chuyển menu thành dạng cột, nằm tuyệt đối bên dưới header */
-          display: none; /* Mặc định ẩn menu */
+          display: flex;
           flex-direction: column;
           position: absolute;
-          top: 80px; /* Bằng chiều cao của header */
+          top: 90px; /* Bằng chiều cao header của bạn */
           left: 0;
           width: 100%;
           background: linear-gradient(135deg, #099204 0%, #099623 100%);
           box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
           padding: 1rem 0;
+
+          /* 1. Ẩn menu ban đầu */
+          transform: translateY(-100%);
+          opacity: 0;
+          visibility: hidden;
+
+          /* 2. Thêm hiệu ứng */
+          transition: transform 0.6s ease-out, opacity 0.5s ease-out,
+            visibility 0.4s;
         }
 
         .nav-links.show {
-          display: flex; /* Class 'show' sẽ được JS thêm vào để hiện menu */
+          /* 3. Hiện menu khi có class .show */
+          transform: translateY(0);
+          opacity: 1;
+          visibility: visible;
         }
 
         .nav-links li {
           text-align: center;
           width: 100%;
           padding: 1rem 0;
+          /* Tùy chọn: Hiệu ứng cho từng mục */
+          opacity: 0;
+          transform: translateY(-10px);
+          transition: opacity 0.3s ease-out, transform 0.3s ease-out;
         }
 
         .nav-links li:not(:last-child) {
           border-bottom: 1px solid rgba(255, 255, 255, 0.2);
         }
+
+        /* Tùy chọn: Hiệu ứng xuất hiện lần lượt */
+        .nav-links.show li {
+          opacity: 1;
+          transform: translateY(0);
+        }
+
+        .nav-links.show li:nth-child(1) {
+          transition-delay: 0.1s;
+        }
+        .nav-links.show li:nth-child(2) {
+          transition-delay: 0.15s;
+        }
+        .nav-links.show li:nth-child(3) {
+          transition-delay: 0.2s;
+        }
+        .nav-links.show li:nth-child(4) {
+          transition-delay: 0.25s;
+        }
+        .nav-links.show li:nth-child(5) {
+          transition-delay: 0.3s;
+        }
+        .nav-links.show li:nth-child(6) {
+          transition-delay: 0.35s;
+        }
+        .nav-links.show li:nth-child(7) {
+          transition-delay: 0.4s;
+        }
+        /* --- Kết thúc CSS cho menu di động --- */
+
+        /* === BẮT ĐẦU CSS CHUNG CHO SLIDER === */
+        /* Áp dụng cho 4 section: .features, .process, .certification, .investment */
+        .features,
+        .process,
+        .certification,
+        .investment {
+          padding-left: 0;
+          padding-right: 0;
+        }
+
+        .features h2,
+        .process h2,
+        .certification h2,
+        .investment h2 {
+          padding-left: 2rem;
+          padding-right: 2rem;
+        }
+
+        /* Class mới cho các grid */
+        .scroll-grid {
+          display: flex;
+          overflow-x: auto;
+          flex-wrap: nowrap;
+          scroll-snap-type: x mandatory;
+          padding-left: 5vw;
+          padding-right: 5vw;
+          padding-top: 1rem;
+          padding-bottom: 1.5rem;
+          gap: 1.5rem;
+          -webkit-overflow-scrolling: touch;
+          scrollbar-width: none;
+        }
+
+        .scroll-grid::-webkit-scrollbar {
+          display: none;
+        }
+        .process-steps.scroll-grid {
+          padding-top: 2.5rem;
+        }
+
+        /* Áp dụng cho tất cả thẻ bên trong slider */
+        .scroll-grid > .feature-card,
+        .scroll-grid > .step,
+        .scroll-grid > .cert-card,
+        .scroll-grid > .package {
+          flex-shrink: 0;
+          scroll-snap-align: center;
+          width: 90vw;
+        }
+
+        .scroll-grid > .feature-card h3 {
+          font-size: 1.3rem;
+        }
+        .scroll-grid > .feature-card p {
+          font-size: 0.9rem;
+        }
+
+        /* --- Bắt đầu CSS cho Nút trượt --- */
+        .slider-wrapper {
+          position: relative;
+        }
+
+        .scroll-btn {
+          display: none;
+          align-items: center;
+          justify-content: center;
+          position: absolute;
+          top: 50%;
+          transform: translateY(-50%);
+          background-color: rgba(255, 255, 255, 0.9);
+          border: 1px solid #ddd;
+          border-radius: 50%;
+          width: 40px;
+          height: 40px;
+          font-size: 1.2rem;
+          color: #333;
+          cursor: pointer;
+          z-index: 10;
+          box-shadow: 0 2px 5px rgba(0, 0, 0, 0.15);
+          transition: all 0.2s;
+        }
+
+        .scroll-btn:hover {
+          background-color: white;
+        }
+
+        .scroll-btn.hidden {
+          display: none;
+        }
+
+        .scroll-btn.prev {
+          left: 0.5rem;
+        }
+
+        .scroll-btn.next {
+          right: 0.5rem;
+        }
+        /* --- Kết thúc CSS cho Nút trượt --- */
       }
+      /* ======================================================= */
+      /* === KẾT THÚC CSS CHO DI ĐỘNG (RESPONSIVE) === */
+      /* ======================================================= */
     </style>
   </head>
   <body>
@@ -706,92 +932,146 @@
 
     <section class="features" id="features">
       <h2>Tại Sao Chọn Chúng Tôi?</h2>
-      <div class="feature-grid">
-        <div class="feature-card">
-          <div class="feature-icon"><i class="fas fa-mobile-alt"></i></div>
-          <h3>Giám Sát Từ Xa</h3>
-          <p>
-            Theo dõi chồn của bạn 24/7 qua ứng dụng điện thoại với camera trực
-            tiếp và cập nhật tình trạng sức khỏe
-          </p>
+      <div class="features-wrapper slider-wrapper">
+        <button class="scroll-btn prev">
+          <i class="fas fa-chevron-left"></i>
+        </button>
+        <div class="feature-grid scroll-grid">
+          <div class="feature-card">
+            <div class="feature-icon">
+              <img
+                src="/icon/responsive.gif"
+                alt="Icon Giám Sát Từ Xa"
+                class="custom-icon-gif"
+              />
+            </div>
+            <h3>Giám Sát Từ Xa</h3>
+            <p>
+              Theo dõi chồn của bạn 24/7 qua ứng dụng điện thoại với camera trực
+              tiếp và cập nhật tình trạng sức khỏe
+            </p>
+          </div>
+          <div class="feature-card">
+            <div class="feature-icon">
+              <img
+                src="/icon/stamp.gif"
+                alt="Icon Giấy Chứng Nhận"
+                class="custom-icon-gif"
+              />
+            </div>
+            <h3>Giấy Chứng Nhận</h3>
+            <p>
+              Đầy đủ giấy phép kinh doanh, chứng nhận thú y và các giấy tờ pháp
+              lý minh bạch
+            </p>
+          </div>
+          <div class="feature-card">
+            <div class="feature-icon">
+              <img
+                src="/icon/animal-care.gif"
+                alt="Icon Chăm Sóc"
+                class="custom-icon-gif"
+              />
+            </div>
+            <h3>Chăm Sóc Chuyên Nghiệp</h3>
+            <p>
+              Đội ngũ chuyên gia thú y và nhân viên giàu kinh nghiệm chăm sóc
+              24/7
+            </p>
+          </div>
+          <div class="feature-card">
+            <div class="feature-icon">
+              <img
+                src="/icon/compensation.gif"
+                alt="Icon Lợi Nhuận"
+                class="custom-icon-gif"
+              />
+            </div>
+            <h3>Lợi Nhuận Hấp Dẫn</h3>
+            <p>
+              Cam kết lợi nhuận ổn định với chu kỳ nuôi rõ ràng và thị trường
+              tiêu thụ đảm bảo
+            </p>
+          </div>
+          <div class="feature-card">
+            <div class="feature-icon">
+              <img
+                src="/icon/shield.gif"
+                alt="Icon An Toàn"
+                class="custom-icon-gif"
+              />
+            </div>
+            <h3>An Toàn & Bảo Mật</h3>
+            <p>
+              Hợp đồng pháp lý rõ ràng, bảo hiểm vật nuôi và cam kết hoàn trả
+              vốn
+            </p>
+          </div>
+          <div class="feature-card">
+            <div class="feature-icon">
+              <img
+                src="/icon/analytics.gif"
+                alt="Icon Báo Cáo"
+                class="custom-icon-gif"
+              />
+            </div>
+            <h3>Báo Cáo Minh Bạch</h3>
+            <p>
+              Cập nhật báo cáo tăng trưởng, chi phí và lợi nhuận định kỳ hàng
+              tháng
+            </p>
+          </div>
         </div>
-        <div class="feature-card">
-          <div class="feature-icon"><i class="fas fa-trophy"></i></div>
-          <h3>Giấy Chứng Nhận</h3>
-          <p>
-            Đầy đủ giấy phép kinh doanh, chứng nhận thú y và các giấy tờ pháp lý
-            minh bạch
-          </p>
-        </div>
-        <div class="feature-card">
-          <div class="feature-icon"><i class="fas fa-user-doctor"></i></div>
-          <h3>Chăm Sóc Chuyên Nghiệp</h3>
-          <p>
-            Đội ngũ chuyên gia thú y và nhân viên giàu kinh nghiệm chăm sóc 24/7
-          </p>
-        </div>
-        <div class="feature-card">
-          <div class="feature-icon"><i class="fas fa-sack-dollar"></i></div>
-          <h3>Lợi Nhuận Hấp Dẫn</h3>
-          <p>
-            Cam kết lợi nhuận ổn định với chu kỳ nuôi rõ ràng và thị trường tiêu
-            thụ đảm bảo
-          </p>
-        </div>
-        <div class="feature-card">
-          <div class="feature-icon"><i class="fas fa-lock"></i></div>
-          <h3>An Toàn & Bảo Mật</h3>
-          <p>
-            Hợp đồng pháp lý rõ ràng, bảo hiểm vật nuôi và cam kết hoàn trả vốn
-          </p>
-        </div>
-        <div class="feature-card">
-          <div class="feature-icon"><i class="fas fa-chart-bar"></i></div>
-          <h3>Báo Cáo Minh Bạch</h3>
-          <p>
-            Cập nhật báo cáo tăng trưởng, chi phí và lợi nhuận định kỳ hàng
-            tháng
-          </p>
-        </div>
+        <button class="scroll-btn next">
+          <i class="fas fa-chevron-right"></i>
+        </button>
       </div>
     </section>
 
     <section class="process" id="process">
       <div class="process-container">
         <h2>Quy Trình Nuôi Dưỡng Chuyên Nghiệp</h2>
-        <div class="process-steps">
-          <div class="step">
-            <div class="step-number">1</div>
-            <h3>Chọn Giống & Kiểm Tra</h3>
-            <p>
-              Chọn lọc chồn giống khỏe mạnh, có nguồn gốc rõ ràng. Kiểm tra sức
-              khỏe toàn diện bởi bác sĩ thú y.
-            </p>
+        <div class="slider-wrapper">
+          <button class="scroll-btn prev">
+            <i class="fas fa-chevron-left"></i>
+          </button>
+          <div class="process-steps scroll-grid">
+            <div class="step">
+              <div class="step-number">1</div>
+              <h3>Chọn Giống & Kiểm Tra</h3>
+              <p>
+                Chọn lọc chồn giống khỏe mạnh, có nguồn gốc rõ ràng. Kiểm tra
+                sức khỏe toàn diện bởi bác sĩ thú y.
+              </p>
+            </div>
+            <div class="step">
+              <div class="step-number">2</div>
+              <h3>Nuôi Dưỡng & Chăm Sóc</h3>
+              <p>
+                Chế độ dinh dưỡng khoa học, chuồng trại sạch sẽ, theo dõi sức
+                khỏe hàng ngày.
+              </p>
+            </div>
+            <div class="step">
+              <div class="step-number">3</div>
+              <h3>Giám Sát & Báo Cáo</h3>
+              <p>
+                Cập nhật tình trạng qua ứng dụng, camera trực tiếp, báo cáo tăng
+                trưởng định kỳ.
+              </p>
+            </div>
+            <div class="step">
+              <div class="step-number">4</div>
+              <h3>Thu Hoạch & Thanh Toán</h3>
+              <p>
+                Thu hoạch đúng thời điểm, tiêu thụ sản phẩm và thanh toán lợi
+                nhuận cho nhà đầu tư.
+              </p>
+            </div>
           </div>
-          <div class="step">
-            <div class="step-number">2</div>
-            <h3>Nuôi Dưỡng & Chăm Sóc</h3>
-            <p>
-              Chế độ dinh dưỡng khoa học, chuồng trại sạch sẽ, theo dõi sức khỏe
-              hàng ngày.
-            </p>
-          </div>
-          <div class="step">
-            <div class="step-number">3</div>
-            <h3>Giám Sát & Báo Cáo</h3>
-            <p>
-              Cập nhật tình trạng qua ứng dụng, camera trực tiếp, báo cáo tăng
-              trưởng định kỳ.
-            </p>
-          </div>
-          <div class="step">
-            <div class="step-number">4</div>
-            <h3>Thu Hoạch & Thanh Toán</h3>
-            <p>
-              Thu hoạch đúng thời điểm, tiêu thụ sản phẩm và thanh toán lợi
-              nhuận cho nhà đầu tư.
-            </p>
-          </div>
+          <button class="scroll-btn next">
+            <i class="fas fa-chevron-right"></i>
+          </button>
         </div>
       </div>
     </section>
@@ -809,7 +1089,7 @@
               allowfullscreen
             ></iframe>
           </div>
-        </br>
+          <br />
           <div class="video-wrapper">
             <iframe
               src="https://res.cloudinary.com/dcquw2fpp/video/upload/v1760733356/video1_b1tcw0.mp4"
@@ -819,27 +1099,6 @@
               allowfullscreen
             ></iframe>
           </div>
-          <!-- <div class="video-overlay-text">
-            <p><strong>Số định danh:</strong> CXXXX</p>
-            <p>
-              <strong>Giống vật nuôi:</strong> cầy voi hương lai
-            </p>
-            <p>
-              <strong>Sinh năm:</strong> 2025
-            </p>
-            <p>
-              <strong>ngày nhập:</strong> 26/09/2025
-            </p>
-            <p>
-              <strong>Chủ sở hữu:</strong> Nguyễn Văn A
-            </p>
-            <p>
-              <strong>Mã Khách:</strong> ...................
-            </p>
-            <p>
-              <strong>Quê Quán:</strong> ...................
-            </p>
-          </div> -->
         </div>
         <div>
           <ul class="tech-features">
@@ -874,69 +1133,85 @@
 
     <section class="certification">
       <h2>Giấy Chứng Nhận & Pháp Lý</h2>
-      <div class="cert-grid">
-        <div
-          class="cert-card"
-          data-img-src="./anh/giaychungnhan/macosonuoi.jpg"
-        >
-          <div class="cert-icon"><i class="fas fa-file-alt"></i></div>
-          <h3>MÃ SỐ CƠ SỞ NUÔI, TRỒNG</h3>
+      <div class="slider-wrapper">
+        <button class="scroll-btn prev">
+          <i class="fas fa-chevron-left"></i>
+        </button>
+        <div class="cert-grid scroll-grid">
+          <div
+            class="cert-card"
+            data-img-src="./anh/giaychungnhan/macosonuoi.jpg"
+          >
+            <div class="cert-icon"><i class="fas fa-file-alt"></i></div>
+            <h3>MÃ SỐ CƠ SỞ NUÔI, TRỒNG</h3>
+          </div>
+          <div
+            class="cert-card"
+            data-img-src="./anh/giaychungnhan/sotheodoihoatdong.jpg"
+          >
+            <div class="cert-icon"><i class="fas fa-book-medical"></i></div>
+            <h3>SỔ THEO DÕI HOẠT ĐỘNG</h3>
+          </div>
+          <div
+            class="cert-card"
+            data-img-src="./anh/giaychungnhan/giaychungnhan.jpg"
+          >
+            <div class="cert-icon"><i class="fas fa-check-circle"></i></div>
+            <h3>GIẤY CHỨNG NHẬN</h3>
+          </div>
         </div>
-        <div
-          class="cert-card"
-          data-img-src="./anh/giaychungnhan/sotheodoihoatdong.jpg"
-        >
-          <div class="cert-icon"><i class="fas fa-book-medical"></i></div>
-          <h3>SỔ THEO DÕI HOẠT ĐỘNG</h3>
-        </div>
-        <div
-          class="cert-card"
-          data-img-src="./anh/giaychungnhan/giaychungnhan.jpg"
-        >
-          <div class="cert-icon"><i class="fas fa-check-circle"></i></div>
-          <h3>GIẤY CHỨNG NHẬN</h3>
-        </div>
+        <button class="scroll-btn next">
+          <i class="fas fa-chevron-right"></i>
+        </button>
       </div>
     </section>
 
     <section class="investment" id="investment">
       <h2>Hợp tác cùng Tâm Nha Farm</h2>
-      <div class="investment-packages">
-        <div class="package">
-          <h3>Nuôi Con Giống</h3>
-          <div class="price">8.500.000 đ</div>
-          <ul>
-            <li>✓ 2 con</li>
-            <li>✓ Chu kỳ trao đổi cùng chủ trang trại</li>
-            <li>✓ Giám sát qua app</li>
-            <li>✓ Báo cáo hàng tháng</li>
-          </ul>
-          <a href="#contact" class="cta-button">Đăng Ký</a>
+      <div class="slider-wrapper">
+        <button class="scroll-btn prev">
+          <i class="fas fa-chevron-left"></i>
+        </button>
+        <div class="investment-packages scroll-grid">
+          <div class="package">
+            <h3>Nuôi Con Giống</h3>
+            <div class="price">8.500.000 đ</div>
+            <ul>
+              <li>✓ 2 con</li>
+              <li>✓ Chu kỳ trao đổi cùng chủ trang trại</li>
+              <li>✓ Giám sát qua app</li>
+              <li>✓ Báo cáo hàng tháng</li>
+            </ul>
+            <a href="#contact" class="cta-button">Đăng Ký</a>
+          </div>
+          <div class="package featured">
+            <h3>Nuôi Dưỡng</h3>
+            <div class="price">16.000.000 đ</div>
+            <ul>
+              <li>✓ 1 con</li>
+              <li>✓ Chu kỳ trao đổi cùng chủ trang trại</li>
+              <li>✓ Giám sát qua app</li>
+              <li>✓ Báo cáo hàng tuần</li>
+              <li>✓ Hỗ trợ ưu tiên</li>
+            </ul>
+            <a href="#contact" class="cta-button">Đăng Ký</a>
+          </div>
+          <div class="package">
+            <h3>Vỗ Béo Con Chim</h3>
+            <div class="price">30.000.000 đ</div>
+            <ul>
+              <li>✓ 1 con</li>
+              <li>✓ Chu kỳ đổi cùng chủ trang trại</li>
+              <li>✓ Camera riêng 24/7</li>
+              <li>✓ Báo cáo theo yêu cầu</li>
+              <li>✓ Chuyên viên riêng</li>
+            </ul>
+            <a href="#contact" class="cta-button">Đăng Ký</a>
+          </div>
         </div>
-        <div class="package featured">
-          <h3>Nuôi Dưỡng</h3>
-          <div class="price">16.000.000 đ</div>
-          <ul>
-            <li>✓ 1 con</li>
-            <li>✓ Chu kỳ trao đổi cùng chủ trang trại</li>
-            <li>✓ Giám sát qua app</li>
-            <li>✓ Báo cáo hàng tuần</li>
-            <li>✓ Hỗ trợ ưu tiên</li>
-          </ul>
-          <a href="#contact" class="cta-button">Đăng Ký</a>
-        </div>
-        <div class="package">
-          <h3>Vỗ Béo Con Chim</h3>
-          <div class="price">30.000.000 đ</div>
-          <ul>
-            <li>✓ 1 con</li>
-            <li>✓ Chu kỳ đổi cùng chủ trang trại</li>
-            <li>✓ Camera riêng 24/7</li>
-            <li>✓ Báo cáo theo yêu cầu</li>
-            <li>✓ Chuyên viên riêng</li>
-          </ul>
-          <a href="#contact" class="cta-button">Đăng Ký</a>
-        </div>
+        <button class="scroll-btn next">
+          <i class="fas fa-chevron-right"></i>
+        </button>
       </div>
     </section>
 
@@ -1012,13 +1287,13 @@
             <li><a href="#investment">Đầu tư</a></li>
           </ul>
         </div>
-
         <div class="footer-section">
           <h3>Liên Hệ</h3>
           <ul>
             <li><i class="fas fa-fw fa-phone"></i> 0913771336</li>
             <li>
-              <i class="fas fa-fw fa-map-marker-alt"></i> 219 QL1A, Song Phú, Tam Bình, Vĩnh Long 891810
+              <i class="fas fa-fw fa-map-marker-alt"></i> 219 QL1A, Song Phú,
+              Tam Bình, Vĩnh Long 891810
             </li>
           </ul>
         </div>
@@ -1041,6 +1316,7 @@
 
     <script>
       document.addEventListener("DOMContentLoaded", function () {
+        // --- Code cho Popup ảnh ---
         const popup = document.getElementById("image-popup");
         const popupImage = document.getElementById("popup-content");
         const closeBtn = document.getElementById("popup-close");
@@ -1065,59 +1341,109 @@
             closePopup();
           }
         });
-      });
-    </script>
 
-    <script>
-      const form = document.getElementById("contact-form");
-      const statusDiv = document.getElementById("form-status");
+        // --- Code cho Form liên hệ (Google Sheets) ---
+        const form = document.getElementById("contact-form");
+        const statusDiv = document.getElementById("form-status");
 
-      const scriptURL =
-        "https://script.google.com/macros/s/AKfycbzWKFUP-wTFzyPtMfI9uSmr0RsqW0gZDgPGtWdO0k6vq4QNGjMovbeNB0SWccEJB_8/exec";
+        const scriptURL =
+          "https://script.google.com/macros/s/AKfycbzWKFUP-wTFzyPtMfI9uSmr0RsqW0gZDgPGtWdO0k6vq4QNGjMovbeNB0SWccEJB_8/exec";
 
-      form.addEventListener("submit", (e) => {
-        e.preventDefault();
+        if (form) {
+          form.addEventListener("submit", (e) => {
+            e.preventDefault();
 
-        statusDiv.textContent = "Đang gửi...";
-        statusDiv.style.color = "#333";
+            statusDiv.textContent = "Đang gửi...";
+            statusDiv.style.color = "#333";
 
-        fetch(scriptURL, { method: "POST", body: new FormData(form) })
-          .then((response) => {
-            console.log("Success!", response);
-            statusDiv.textContent =
-              "Gửi thông tin thành công! Chúng tôi sẽ liên hệ với bạn sớm.";
-            statusDiv.style.color = "green";
-            form.reset();
-          })
-          .catch((error) => {
-            console.error("Error!", error.message);
-            statusDiv.textContent = "Đã có lỗi xảy ra. Vui lòng thử lại.";
-            statusDiv.style.color = "red";
+            fetch(scriptURL, { method: "POST", body: new FormData(form) })
+              .then((response) => {
+                console.log("Success!", response);
+                statusDiv.textContent =
+                  "Gửi thông tin thành công! Chúng tôi sẽ liên hệ với bạn sớm.";
+                statusDiv.style.color = "green";
+                form.reset();
+              })
+              .catch((error) => {
+                console.error("Error!", error.message);
+                statusDiv.textContent = "Đã có lỗi xảy ra. Vui lòng thử lại.";
+                statusDiv.style.color = "red";
+              });
           });
-      });
-    </script>
-
-    <script>
-      // JavaScript để xử lý menu trên di động
-      const menuToggle = document.getElementById("mobile-menu-toggle");
-      const navLinks = document.getElementById("nav-links-menu");
-
-      // Khi nhấn vào nút hamburger
-      menuToggle.addEventListener("click", () => {
-        // Thêm hoặc xóa class 'show' để hiện hoặc ẩn menu
-        navLinks.classList.toggle("show");
-      });
-
-      // Tự động đóng menu khi nhấn vào một link (hữu ích cho trang đơn)
-      navLinks.addEventListener("click", (event) => {
-        if (event.target.tagName === "A") {
-          navLinks.classList.remove("show");
         }
+
+        // --- Code cho menu di động ---
+        const menuToggle = document.getElementById("mobile-menu-toggle");
+        const navLinks = document.getElementById("nav-links-menu");
+
+        if (menuToggle && navLinks) {
+          menuToggle.addEventListener("click", () => {
+            // Thêm hoặc xóa class 'show' để hiện hoặc ẩn menu
+            navLinks.classList.toggle("show");
+          });
+          // Tự động đóng menu khi nhấn vào một link
+          navLinks.addEventListener("click", (event) => {
+            if (event.target.tagName === "A") {
+              navLinks.classList.remove("show");
+            }
+          });
+        }
+
+        // --- BẮT ĐẦU: Code tự động cuộn (Auto-scroll) ---
+        function setupAutoScroll(grid) {
+          const scrollInterval = 3000; // Thời gian cuộn: 3 giây
+          let autoScrollTimer = setInterval(scrollNext, scrollInterval);
+
+          function scrollNext() {
+            // 1. Lấy thẻ con đầu tiên để đo
+            const card = grid.querySelector("div");
+            if (!card) return;
+
+            // 2. Tính toán khoảng cách cuộn
+            const gridStyle = window.getComputedStyle(grid);
+            const cardGap = parseFloat(gridStyle.gap) || 24;
+            const scrollAmount = card.offsetWidth + cardGap;
+
+            // 3. Kiểm tra xem có đang ở cuối không (thêm 10px để xử lý sai số)
+            const isAtEnd =
+              grid.scrollLeft + grid.clientWidth + 10 >= grid.scrollWidth;
+
+            if (isAtEnd) {
+              // Nếu ở cuối, cuộn về đầu
+              grid.scrollTo({ left: 0, behavior: "smooth" });
+            } else {
+              // Nếu chưa, cuộn sang phải
+              grid.scrollBy({ left: scrollAmount, behavior: "smooth" });
+            }
+          }
+
+          // Khi người dùng bắt đầu chạm/nhấp chuột, tạm dừng
+          function pauseScroll() {
+            clearInterval(autoScrollTimer);
+          }
+
+          // Khi người dùng nhả tay, đợi 5 giây rồi cuộn tiếp
+          function resumeScroll() {
+            clearInterval(autoScrollTimer); // Xóa mọi timer cũ
+            autoScrollTimer = setInterval(scrollNext, 5000); // Đợi 5s rồi mới bắt đầu lại
+          }
+
+          // Gán sự kiện
+          grid.addEventListener("touchstart", pauseScroll, { passive: true });
+          grid.addEventListener("mousedown", pauseScroll, { passive: true });
+
+          grid.addEventListener("touchend", resumeScroll, { passive: true });
+          grid.addEventListener("mouseup", resumeScroll, { passive: true });
+        }
+
+        // Chỉ chạy auto-scroll trên màn hình di động
+        if (window.innerWidth <= 768) {
+          document.querySelectorAll(".scroll-grid").forEach((grid) => {
+            setupAutoScroll(grid);
+          });
+        }
+        // --- KẾT THÚC: Code tự động cuộn ---
       });
     </script>
   </body>
 </html>
-
-
-
-
