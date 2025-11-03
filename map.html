@@ -339,15 +339,27 @@
         }
       }
 
-      // --- PHẦN 5: HÀM HIỂN THỊ ---
+     // --- PHẦN 5: HÀM HIỂN THỊ ---
+      
+      // *** THAY THẾ TOÀN BỘ HÀM NÀY ***
       function zoomToPlantLocation(viTri) {
+        // viTri có dạng "105908992, 10122172" (Long, Lat)
         try {
-          const [latStr, longStr] = viTri.split(",").map((s) => s.trim());
-          const latClean = latStr.replace("01/", "").replace("/", ".");
-          const lat = parseFloat(latClean);
+          // Tách chuỗi theo dấu phẩy
+          const [longStr, latStr] = viTri.split(",").map((s) => s.trim());
+
+          // Phân tích Vĩ độ (Latitude)
+          // Ví dụ: "10122172" -> 10.122172
+          const lat = parseFloat(latStr.slice(0, 2) + "." + latStr.slice(2));
+
+          // Phân tích Kinh độ (Longitude)
+          // Ví dụ: "105908992" -> 105.908992
           const long = parseFloat(longStr.slice(0, 3) + "." + longStr.slice(3));
+
           if (!isNaN(lat) && !isNaN(long)) {
-            map.setView([lat, long], 22);
+            // Leaflet yêu cầu tọa độ là [LAT, LONG]
+            map.setView([lat, long], 22); // Zoom tối đa đến vị trí
+            
             L.marker([lat, long])
               .addTo(map)
               .bindPopup("Vị trí cây")
@@ -393,4 +405,5 @@
     </script>
   </body>
 </html>
+
 
