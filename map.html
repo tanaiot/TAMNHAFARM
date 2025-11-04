@@ -12,65 +12,133 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
 
-   <style>
+  <style>
       /* --- CSS CHO BỐ CỤC MỚI --- */
       html,
       body {
-        margin: 0; padding: 0; font-family: Arial, sans-serif;
-        height: 100vh; width: 100vw; overflow: hidden;
+        margin: 0;
+        padding: 0;
+        font-family: Arial, sans-serif;
+        height: 100vh;
+        width: 100vw;
+        overflow: hidden;
+        font-size: 15px;
       }
       #map {
-        height: 100%; width: 100%; z-index: 1;
+        height: 100%;
+        width: 100%;
+        z-index: 1;
       }
       #search-bar-container {
-        position: absolute; top: 20px; left: 50%;
-        transform: translateX(-50%); width: 90%;
-        max-width: 500px; z-index: 999;
+        position: absolute;
+        top: 20px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 90%;
+        max-width: 500px;
+        z-index: 999;
+        padding-left: 5vh;
       }
       #search-input {
-        width: 100%; padding: 12px 20px; border: none;
+        width: 100%;
+        padding: 12px 20px;
+        border: none;
         border-radius: 50px;
         box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
         font-size: 16px;
       }
       #btn-start-scan-main {
-        position: absolute; bottom: 30px; left: 50%;
-        transform: translateX(-50%); z-index: 999;
+        position: absolute;
+        bottom: 30px;
+        left: 50%;
+        transform: translateX(-50%);
+        z-index: 999;
         box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
       }
-      
-      /* === (ĐÃ THAY ĐỔI) Chuyển panel sang góc trên-bên-phải === */
+
+      /* Panel cơ bản */
       #scanner-panel {
         position: absolute;
         top: 20px;
-        /* left: 20px; */ /* Xóa dòng này */
-        right: 20px; /* Thêm dòng này */
-        
-        width: 360px; max-width: 90%; max-height: 90vh;
-        background-color: white; border-radius: 12px;
+        left: 20px;
+        width: 360px;
+        max-width: 90%;
+        max-height: 90vh;
+        background-color: white;
+        border-radius: 12px;
         box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
-        z-index: 1000; padding: 1rem; overflow-y: auto;
+        z-index: 1000;
+        padding: 1rem;
+        overflow-y: auto;
+        padding-left: 5vh;
+        transition: opacity 0.3s ease-out, visibility 0.3s ease-out;
       }
-      .hidden { display: none; }
-      
+      .hidden {
+        opacity: 0;
+        visibility: hidden;
+      }
+
+      /* Tối ưu cho điện thoại (responsive design) */
+      @media (max-width: 640px) {
+        #scanner-panel {
+          top: auto;
+          bottom: 0;
+          left: 0;
+          right: 0;
+          width: 100%;
+          max-width: 100%;
+          max-height: 50vh; /* Tăng chiều cao để hiển thị đầy đủ hơn, nhưng không che hết bản đồ */
+          border-radius: 12px 12px 0 0;
+          padding-bottom: env(
+            safe-area-inset-bottom
+          ); /* Xử lý notch trên iPhone */
+          transition: tranform 0.3s ease-out, visibility 0.3s ease-out;
+          transform: translateY(0);
+          opacity: 1;
+          visibility: visible;
+        }
+        .hidden {
+          opacity: 1;
+          transform: translateY(100%);
+          visibility: hidden;
+        }
+        #search-bar-container {
+          top: 10px;
+          width: 95%;
+        }
+        #btn-start-scan-main {
+          bottom: 20px;
+        }
+      }
+
       /* --- CSS CHO FORM (Giữ nguyên) --- */
       .info-label {
-        display: block; font-size: 0.75rem; font-weight: 700;
-        color: #374151; margin-bottom: 0.25rem;
+        display: block;
+        font-size: 0.75rem;
+        font-weight: 700;
+        color: #374151;
+        margin-bottom: 0.25rem;
       }
       .info-input {
-        width: 100%; padding: 0.375rem 0.5rem; border: 1px solid #d1d5db;
-        border-radius: 0.375rem; box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-        font-size: 0.875rem; color: #1e40af; font-weight: 500;
+        width: 100%;
+        padding: 0.375rem 0.5rem;
+        border: 1px solid #d1d5db;
+        border-radius: 0.375rem;
+        box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+        font-size: 0.875rem;
+        color: #1e40af;
+        font-weight: 500;
       }
       .info-input:focus {
-        outline: none; box-shadow: 0 0 0 2px #22c55e;
+        outline: none;
+        box-shadow: 0 0 0 2px #22c55e;
         border-color: #22c55e;
       }
       .info-value {
-        font-size: 1rem; font-weight: 600; color: #111827;
+        font-size: 1rem;
+        font-weight: 600;
+        color: #111827;
       }
-    </style>
   </head>
   <body class="bg-gray-100">
     <div id="map"></div>
@@ -564,6 +632,7 @@
     </script>
   </body>
 </html>
+
 
 
 
