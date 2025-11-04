@@ -3,58 +3,275 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Bản đồ Toàn Cảnh Nông Trại</title>
-
+    <title>Bản đồ và Quản lý Cây Trồng</title>
     <link
       rel="stylesheet"
       href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
     />
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
 
     <style>
-      /* Thiết lập cho toàn bộ trang 
-      */
+      /* --- CSS CHO BỐ CỤC MỚI --- */
       html,
       body {
         margin: 0;
         padding: 0;
         font-family: Arial, sans-serif;
-        height: 100vh; /* 100% chiều cao màn hình */
-        width: 100vw; /* 100% chiều rộng màn hình */
-        overflow: hidden; /* Ẩn thanh cuộn */
+        height: 100vh;
+        width: 100vw;
+        overflow: hidden;
       }
-
-      /* Container chứa bản đồ, chiếm 100% trang
-      */
-      #map-container {
-        height: 100%;
-        width: 100%;
-      }
-
-      /* Bản đồ bên trong container, cũng chiếm 100%
-      */
       #map {
         height: 100%;
         width: 100%;
+        z-index: 1;
+      }
+      #search-bar-container {
+        position: absolute;
+        top: 20px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 90%;
+        max-width: 500px;
+        z-index: 999;
+      }
+      #search-input {
+        width: 100%;
+        padding: 12px 20px;
+        border: none;
+        border-radius: 50px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        font-size: 16px;
+      }
+      #btn-start-scan-main {
+        position: absolute;
+        bottom: 30px;
+        left: 50%;
+        transform: translateX(-50%);
+        z-index: 999;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+      }
+      #scanner-panel {
+        position: absolute;
+        top: 20px;
+        left: 20px;
+        width: 360px;
+        max-width: 90%;
+        max-height: 90vh;
+        background-color: white;
+        border-radius: 12px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+        z-index: 1000;
+        padding: 1rem;
+        overflow-y: auto;
+      }
+      .hidden {
+        display: none;
+      }
+
+      /* --- CSS CHO FORM (Giữ nguyên) --- */
+      .info-label {
+        display: block;
+        font-size: 0.75rem;
+        font-weight: 700;
+        color: #374151;
+        margin-bottom: 0.25rem;
+      }
+      .info-input {
+        width: 100%;
+        padding: 0.375rem 0.5rem;
+        border: 1px solid #d1d5db;
+        border-radius: 0.375rem;
+        box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+        font-size: 0.875rem;
+        color: #1e40af;
+        font-weight: 500;
+      }
+      .info-input:focus {
+        outline: none;
+        box-shadow: 0 0 0 2px #22c55e;
+        border-color: #22c55e;
+      }
+      .info-value {
+        font-size: 1rem;
+        font-weight: 600;
+        color: #111827;
       }
     </style>
   </head>
-  <body>
-    <div id="map-container">
-      <div id="map"></div>
+  <body class="bg-gray-100">
+    <div id="map"></div>
+
+    <div id="search-bar-container">
+      <input
+        type="text"
+        id="search-input"
+        placeholder="Tìm Mã Cây (DXL0001) hoặc Tọa độ (10.122149,105.909057)"
+      />
     </div>
-    
+
+    <button
+      id="btn-start-scan-main"
+      class="bg-green-600 text-white font-bold py-3 px-6 text-lg rounded-lg hover:bg-green-700 transition-all"
+    >
+      Bắt Đầu Quét
+    </button>
+
+    <div id="scanner-panel" class="hidden">
+      <button
+        id="btn-back-to-home"
+        class="w-full bg-gray-600 text-white font-bold py-2 px-3 text-sm rounded-lg hover:bg-gray-700 transition-all mb-3"
+      >
+        &larr; Quay lại
+      </button>
+
+      <h1 class="text-xl font-bold text-center text-green-700 mb-3">
+        Quản Lý Cây Trồng
+      </h1>
+
+      <div id="scanner-section">
+        <div
+          id="scanner-container"
+          class="mb-3 w-full border-2 border-gray-300 rounded-lg overflow-hidden"
+          style="min-height: 200px"
+        ></div>
+      </div>
+
+      <div id="result-section" class="hidden">
+        <div id="loading-spinner" class="text-center my-3 hidden">
+          <div class="text-blue-600 font-medium">Đang tìm kiếm...</div>
+        </div>
+
+        <div
+          id="error-message"
+          class="text-center my-3 p-2 bg-red-100 text-red-700 rounded-lg hidden"
+        ></div>
+
+        <div id="result-container" class="space-y-3">
+          <div>
+            <div class="info-label">Mã Vạch/Tìm kiếm</div>
+            <div id="result-id" class="info-value text-blue-600"></div>
+          </div>
+          <hr />
+          <div>
+            <label class="info-label" for="result-ma-cay">Mã Cây</label>
+            <input
+              type="text"
+              id="result-ma-cay"
+              class="info-input bg-gray-100"
+              readonly
+            />
+          </div>
+          <div>
+            <label class="info-label" for="result-ten">Tên Thường Gọi</label>
+            <input type="text" id="result-ten" class="info-input" />
+          </div>
+          <div>
+            <label class="info-label" for="result-ten-khoa-hoc"
+              >Tên Khoa Học</label
+            >
+            <input type="text" id="result-ten-khoa-hoc" class="info-input" />
+          </div>
+          <div>
+            <label class="info-label" for="result-tinh-trang"
+              >Tình Trạng Sức Khỏe</label
+            >
+            <select id="result-tinh-trang" class="info-input">
+              <option value="Tốt">Tốt</option>
+              <option value="Trung Bình">Trung Bình</option>
+              <option value="Kém">Kém</option>
+            </select>
+          </div>
+
+          <div>
+            <div class="flex gap-2">
+              <div class="w-1/2">
+                <label class="info-label" for="result-lat">Vị Trí (Lat)</label>
+                <input
+                  type="text"
+                  id="result-lat"
+                  class="info-input"
+                  placeholder="10122172"
+                />
+              </div>
+              <div class="w-1/2">
+                <label class="info-label" for="result-long"
+                  >Vị Trí (Long)</label
+                >
+                <input
+                  type="text"
+                  id="result-long"
+                  class="info-input"
+                  placeholder="105909057"
+                />
+              </div>
+            </div>
+            <button
+              id="btn-search-coords"
+              class="w-full bg-indigo-500 text-white font-bold py-1 px-2 text-xs rounded-lg hover:bg-indigo-600 transition-all mt-2"
+            >
+              Tìm Tọa Độ Này
+            </button>
+          </div>
+
+          <div>
+            <label class="info-label" for="result-ngay-trong">Ngày Trồng</label>
+            <input
+              type="text"
+              id="result-ngay-trong"
+              class="info-input"
+              placeholder="Ví dụ: 15/01/2023"
+            />
+          </div>
+        </div>
+
+        <div
+          id="save-status"
+          class="text-center my-3 p-2 rounded-lg hidden"
+        ></div>
+
+        <button
+          id="btn-select-location"
+          class="w-full bg-yellow-500 text-black font-bold py-2 px-3 text-sm rounded-lg hover:bg-yellow-600 transition-all mt-4"
+        >
+          Chọn Vị Trí Trên Bản Đồ
+        </button>
+
+        <button
+          id="btn-remove-pin"
+          class="w-full bg-red-500 text-white font-bold py-2 px-3 text-sm rounded-lg hover:bg-red-600 transition-all mt-2"
+        >
+          Bỏ Ghim
+        </button>
+
+        <div class="flex gap-4 mt-4">
+          <button
+            id="btn-scan-again"
+            class="w-1/2 bg-gray-600 text-white font-bold py-2 px-3 text-sm rounded-lg hover:bg-gray-700 transition-all"
+          >
+            Quét Lại
+          </button>
+          <button
+            id="btn-save"
+            class="w-1/2 bg-blue-600 text-white font-bold py-2 px-3 text-sm rounded-lg hover:bg-blue-700 transition-all"
+          >
+            Lưu Thay Đổi
+          </button>
+        </div>
+      </div>
+    </div>
+
     <script>
       // --- PHẦN 1: KHỞI TẠO BẢN ĐỒ ---
-      // (Giữ nguyên phần khởi tạo bản đồ của bạn)
       const map = L.map("map", {
-        center: [10.122241670031254, 105.91019045369704],
+        center: [10.122241670031254, 105.909057], // Cập nhật tọa độ trung tâm
         zoom: 22,
         minZoom: 15,
         maxZoom: 22,
       });
 
-      // Lớp bản đồ (tile layer) từ MapTiler
       L.tileLayer(
         "https://api.maptiler.com/tiles/019a39b4-4745-700c-b991-07dc74d49321/{z}/{x}/{y}.png?key=SUK1Kacu0nBmruoAMGBy",
         {
@@ -64,15 +281,315 @@
         }
       ).addTo(map);
 
-      // --- ĐÃ XÓA PHẦN 2 ĐẾN 6 ---
-      // (Không còn các biến, hàm scanner, hàm fetch, hay event listener
-      // vì đã xóa form)
+      let currentMarker = null;
 
-      // TODO: Thêm code để tải và ghim tất cả các cây lên bản đồ
+      // --- PHẦN 2: KHAI BÁO BIẾN ---
+      const GAS_WEB_APP_URL =
+        "https://script.google.com/macros/s/AKfycbwW_tbNknCRXl686KqF039_pV7OSqpefgXJpoQqy9MhBfC7UlprIAQ6dFjzChFsT56y_Q/exec";
 
+      const html5QrCode = new Html5Qrcode("scanner-container");
+
+      // UI Chính
+      const searchBarContainer = document.getElementById(
+        "search-bar-container"
+      );
+      const searchInput = document.getElementById("search-input");
+      const btnStartScanMain = document.getElementById("btn-start-scan-main");
+      const scannerPanel = document.getElementById("scanner-panel");
+      const btnBackToHome = document.getElementById("btn-back-to-home");
+
+      // Panel bên trong
+      const scannerSection = document.getElementById("scanner-section");
+      const resultSection = document.getElementById("result-section");
+      const btnScanAgain = document.getElementById("btn-scan-again");
+      const btnSave = document.getElementById("btn-save");
+      const btnSelectLocation = document.getElementById("btn-select-location");
+      const btnSearchCoords = document.getElementById("btn-search-coords");
+      const btnRemovePin = document.getElementById("btn-remove-pin");
+      const loadingSpinner = document.getElementById("loading-spinner");
+      const errorMessage = document.getElementById("error-message");
+      const saveStatus = document.getElementById("save-status");
+      const resultContainer = document.getElementById("result-container");
+
+      // Form
+      const resultId = document.getElementById("result-id");
+      const resultMaCay = document.getElementById("result-ma-cay");
+      const resultTen = document.getElementById("result-ten");
+      const resultTenKhoaHoc = document.getElementById("result-ten-khoa-hoc");
+      const resultTinhTrang = document.getElementById("result-tinh-trang");
+      const resultLat = document.getElementById("result-lat");
+      const resultLong = document.getElementById("result-long");
+      const resultNgayTrong = document.getElementById("result-ngay-trong");
+
+      // --- PHẦN 3: HÀM ĐIỀU KHIỂN UI VÀ SCANNER ---
+
+      function showScanPanel() {
+        btnStartScanMain.classList.add("hidden");
+        searchBarContainer.classList.add("hidden");
+        scannerPanel.classList.remove("hidden");
+        scannerSection.classList.remove("hidden");
+        resultSection.classList.add("hidden");
+        removePin();
+        startScanner();
+      }
+
+      function hideScanPanel() {
+        scannerPanel.classList.add("hidden");
+        btnStartScanMain.classList.remove("hidden");
+        searchBarContainer.classList.remove("hidden");
+        html5QrCode.stop().catch((err) => console.warn("Scanner stop error."));
+        removePin();
+      }
+
+      function startScanner() {
+        const config = { fps: 10, qrbox: { width: 300, height: 150 } };
+        html5QrCode
+          .start(
+            { facingMode: "environment" },
+            config,
+            onScanSuccess,
+            onScanFailure
+          )
+          .catch((err) => {
+            console.error("Không thể khởi động camera", err);
+            showError("Không thể khởi động camera. Vui lòng cấp quyền.");
+            hideScanPanel();
+          });
+      }
+
+      const onScanSuccess = (decodedText, decodedResult) => {
+        console.log(`Scan result: ${decodedText}`);
+        html5QrCode
+          .stop()
+          .catch((err) => console.warn("Error stopping scanner:", err));
+        scannerSection.classList.add("hidden");
+        resultSection.classList.remove("hidden");
+        resultContainer.classList.add("hidden");
+        errorMessage.classList.add("hidden");
+        saveStatus.classList.add("hidden");
+        loadingSpinner.classList.remove("hidden");
+        resultId.innerText = decodedText;
+        fetchPlantData(decodedText);
+      };
+
+      const onScanFailure = (error) => {
+        /* console.warn(`Scan error: ${error}`); */
+      };
+
+      // --- PHẦN 4: HÀM XỬ LÝ DỮ LIỆU (Giữ nguyên) ---
+      async function fetchPlantData(plantId) {
+        const url = `${GAS_WEB_APP_URL}?id=${encodeURIComponent(plantId)}`;
+        try {
+          const response = await fetch(url);
+          const data = await response.json();
+          loadingSpinner.classList.add("hidden");
+          if (data.success) {
+            const plant = data.plantData;
+            resultMaCay.value = plant.maCay;
+            resultTen.value = plant.tenThuongGoi;
+            resultTenKhoaHoc.value = plant.tenKhoaHoc;
+            resultTinhTrang.value = plant.tinhTrang;
+            resultLat.value = plant.viTriLat;
+            resultLong.value = plant.viTriLong;
+            resultNgayTrong.value = plant.ngayTrong;
+            resultContainer.classList.remove("hidden");
+
+            if (plant.viTriLat && plant.viTriLong) {
+              zoomToPlantLocation(plant.viTriLat, plant.viTriLong);
+            } else {
+              alert("Cây này chưa có vị trí. Hãy chấm vào bản đồ để cập nhật.");
+            }
+          } else {
+            showError(`Không tìm thấy cây với Mã: ${plantId}`);
+          }
+        } catch (error) {
+          console.error("Fetch Error:", error);
+          loadingSpinner.classList.add("hidden");
+          showError("Lỗi kết nối (GET). Vui lòng thử lại.");
+        }
+      }
+
+      async function savePlantData() {
+        saveStatus.classList.remove(
+          "hidden",
+          "bg-red-100",
+          "text-red-700",
+          "bg-green-100",
+          "text-green-700"
+        );
+        saveStatus.classList.add("bg-blue-100", "text-blue-700");
+        saveStatus.innerText = "Đang lưu...";
+
+        const plantDataToSave = {
+          maCay: resultMaCay.value,
+          tenThuongGoi: resultTen.value,
+          tenKhoaHoc: resultTenKhoaHoc.value,
+          tinhTrang: resultTinhTrang.value,
+          viTriLat: resultLat.value,
+          viTriLong: resultLong.value,
+          ngayTrong: resultNgayTrong.value,
+        };
+
+        try {
+          const response = await fetch(GAS_WEB_APP_URL, {
+            method: "POST",
+            mode: "cors",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ action: "update", data: plantDataToSave }),
+          });
+          const result = await response.json();
+          if (result.success) {
+            saveStatus.classList.remove("bg-blue-100", "text-blue-700");
+            saveStatus.classList.add("bg-green-100", "text-green-700");
+            saveStatus.innerText = result.message;
+          } else {
+            showSaveError(result.message);
+          }
+        } catch (error) {
+          console.error("Save Error:", error);
+          showSaveError("Lỗi kết nối (POST). Không thể lưu.");
+        }
+      }
+
+      // --- PHẦN 5: HÀM HIỂN THỊ VÀ TÌM KIẾM ---
+
+      // Hàm này chỉ nhận dạng "10122149"
+      function zoomToPlantLocation(latStr, longStr) {
+        removePin();
+        try {
+          const lat = parseFloat(latStr.slice(0, 2) + "." + latStr.slice(2));
+          const long = parseFloat(longStr.slice(0, 3) + "." + longStr.slice(3));
+          if (!isNaN(lat) && !isNaN(long)) {
+            map.setView([lat, long], 22);
+            currentMarker = L.marker([lat, long])
+              .addTo(map)
+              .bindPopup("Vị trí cây")
+              .openPopup();
+          } else {
+            console.error("Tọa độ không hợp lệ:", latStr, longStr);
+          }
+        } catch (e) {
+          console.error("Lỗi xử lý tọa độ:", e);
+        }
+      }
+
+      // Hàm này chuyển (10.123) thành "10123"
+      function selectLocationOnMap() {
+        alert("Hãy chấm vào vị trí của cây trên bản đồ.");
+        map.getContainer().style.cursor = "crosshair";
+        map.once("click", (e) => {
+          removePin();
+          map.getContainer().style.cursor = "";
+          const lat = e.latlng.lat;
+          const long = e.latlng.lng;
+          const latDb = lat.toString().replace(".", "").substring(0, 8);
+          const longDb = long.toString().replace(".", "").substring(0, 9);
+          resultLat.value = latDb;
+          resultLong.value = longDb;
+          map.setView(e.latlng, 22);
+          currentMarker = L.marker(e.latlng)
+            .addTo(map)
+            .bindPopup("Vị trí MỚI")
+            .openPopup();
+        });
+      }
+
+      // Nút tìm kiếm bên trong panel (luôn đọc dạng "10122149")
+      function searchCoordsOnMap() {
+        const latStr = resultLat.value;
+        const longStr = resultLong.value;
+        if (!latStr || !longStr) {
+          alert("Vui lòng nhập cả Lat và Long để tìm.");
+          return;
+        }
+        zoomToPlantLocation(latStr, longStr);
+      }
+
+      // === (ĐÃ SỬA) HÀM XỬ LÝ TÌM KIẾM CHÍNH ===
+      function handleSearch(query) {
+        if (!query) return;
+
+        const parts = query.split(",");
+
+        if (parts.length === 2) {
+          // 1. TÌM TỌA ĐỘ
+          let latStr = parts[0].trim(); // "10.122149" HOẶC "10122149"
+          let longStr = parts[1].trim(); // "105.909057" HOẶC "105909057"
+
+          // --- (MỚI) CHUẨN HÓA DỮ LIỆU ---
+          // Nếu người dùng nhập 10.xxxx, chuyển nó về 10xxxxxx
+          if (latStr.includes(".")) {
+            latStr = latStr.replace(".", "").substring(0, 8);
+          }
+          if (longStr.includes(".")) {
+            longStr = longStr.replace(".", "").substring(0, 9);
+          }
+          // Giờ latStr và longStr LUÔN ở dạng "10122149", "105909057"
+          // --- KẾT THÚC CHUẨN HÓA ---
+
+          // Điền vào các ô (để người dùng thấy)
+          resultLat.value = latStr;
+          resultLong.value = longStr;
+
+          zoomToPlantLocation(latStr, longStr); // Gọi hàm zoom (đã xử lý dạng "10122149")
+          searchInput.value = ""; // Xóa ô tìm kiếm
+        } else {
+          // 2. TÌM MÃ CÂY (ví dụ: DXL0001)
+          btnStartScanMain.classList.add("hidden");
+          searchBarContainer.classList.add("hidden");
+          scannerPanel.classList.remove("hidden");
+          scannerSection.classList.add("hidden");
+          resultSection.classList.remove("hidden");
+          resultContainer.classList.add("hidden");
+          errorMessage.classList.add("hidden");
+          saveStatus.classList.add("hidden");
+          loadingSpinner.classList.remove("hidden");
+
+          resultId.innerText = query;
+          fetchPlantData(query);
+          searchInput.value = "";
+        }
+      }
+
+      function removePin() {
+        if (currentMarker) {
+          currentMarker.remove();
+          currentMarker = null;
+        }
+      }
+
+      function showError(message) {
+        errorMessage.innerText = message;
+        errorMessage.classList.remove("hidden");
+      }
+
+      function showSaveError(message) {
+        saveStatus.classList.remove("bg-blue-100", "text-blue-700");
+        saveStatus.classList.add("bg-red-100", "text-red-700");
+        saveStatus.innerText = message;
+      }
+
+      // --- PHẦN 6: GÁN SỰ KIỆN CHO CÁC NÚT ---
+      btnStartScanMain.addEventListener("click", showScanPanel);
+      btnBackToHome.addEventListener("click", hideScanPanel);
+
+      btnScanAgain.addEventListener("click", () => {
+        resultSection.classList.add("hidden");
+        scannerSection.classList.remove("hidden");
+        removePin();
+        startScanner();
+      });
+
+      btnSave.addEventListener("click", savePlantData);
+      btnSelectLocation.addEventListener("click", selectLocationOnMap);
+      btnSearchCoords.addEventListener("click", searchCoordsOnMap);
+      btnRemovePin.addEventListener("click", removePin);
+
+      searchInput.addEventListener("keypress", function (e) {
+        if (e.key === "Enter") {
+          handleSearch(e.target.value);
+        }
+      });
     </script>
   </body>
 </html>
-
-
-
