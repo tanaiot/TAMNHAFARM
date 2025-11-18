@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="vi">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Bản đồ và Quản lý Cây Trồng</title>
+    <link
+      rel="stylesheet"
+      href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
+    />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
+    <link rel="stylesheet" href="/css/styles_map.css" />
+  </head>
+  <body class="bg-gray-100">
+    <a
+      href="index.html"
+      id="btn-home"
+      class="bg-white text-gray-800 font-bold py-2 px-4 rounded-lg shadow-md hover:bg-gray-100 transition-all"
+    >
+      <i class="fas fa-arrow-left"></i> Back
+    </a>
+    <div id="map"></div>
+
+    <div id="search-bar-container">
+      <input
+        type="text"
+        id="search-input"
+        placeholder="Tìm Mã (DXL0001) hoặc Tọa độ"
+      />
+      <button
+        id="btn-search"
+        class="bg-green-600 text-white font-bold py-2 px-4 rounded-lg hover:bg-green-700 transition-all"
+      >
+        <i class="fas fa-search"></i>
+      </button>
+    </div>
+
+    <button
+      id="btn-start-scan-main"
+      class="bg-green-600 text-white font-bold py-3 px-6 text-lg rounded-lg hover:bg-green-700 transition-all shadow-lg"
+    >
+      <i class="fas fa-qrcode mr-2"></i> Bắt Đầu Quét
+    </button>
+
+    <div id="scanner-panel" class="hidden">
+      <div id="panel-grabber"></div>
+
+      <button id="btn-close-panel" class="btn-close-panel" title="Đóng">
+        <i class="fas fa-times"></i>
+      </button>
+
+      <h1 class="text-xl font-bold text-center text-green-700 mb-2 mt-1">
+        Quản Lý Cây Trồng
+      </h1>
+
+      <div id="scanner-section">
+        <div
+          id="scanner-container"
+          class="mb-3 w-full border-2 border-gray-300 rounded-lg overflow-hidden"
+          style="min-height: 200px; background: #000"
+        ></div>
+        <p class="text-center text-gray-500 text-sm">Hướng camera vào mã QR</p>
+      </div>
+
+      <div id="result-section" class="hidden">
+        <div id="loading-spinner" class="text-center my-3 hidden">
+          <div class="text-blue-600 font-medium">
+            <i class="fas fa-spinner fa-spin"></i> Đang tìm dữ liệu...
+          </div>
+        </div>
+
+        <div
+          id="error-message"
+          class="text-center my-3 p-2 bg-red-100 text-red-700 rounded-lg hidden"
+        ></div>
+
+        <div id="result-container" class="space-y-2">
+          <div>
+            <div class="info-label">Mã Vạch / ID</div>
+            <div id="result-id" class="info-value text-blue-600"></div>
+          </div>
+          <hr class="my-2" />
+          <div>
+            <label class="info-label" for="result-ma-cay">Mã Cây</label>
+            <input
+              type="text"
+              id="result-ma-cay"
+              class="info-input bg-gray-100"
+              readonly
+            />
+          </div>
+          <div>
+            <label class="info-label" for="result-ten">Tên Thường Gọi</label>
+            <input type="text" id="result-ten" class="info-input" />
+          </div>
+          <div>
+            <label class="info-label" for="result-ten-khoa-hoc"
+              >Tên Khoa Học</label
+            >
+            <input type="text" id="result-ten-khoa-hoc" class="info-input" />
+          </div>
+          <div>
+            <label class="info-label" for="result-tinh-trang"
+              >Tình Trạng Sức Khỏe</label
+            >
+            <select id="result-tinh-trang" class="info-input">
+              <option value="Tốt">Tốt</option>
+              <option value="Trung Bình">Trung Bình</option>
+              <option value="Kém">Kém</option>
+            </select>
+          </div>
+
+          <div>
+            <div class="flex gap-2">
+              <div class="w-1/2">
+                <label class="info-label" for="result-lat">Vị Trí (Lat)</label>
+                <input
+                  type="text"
+                  id="result-lat"
+                  class="info-input"
+                  placeholder="10122..."
+                />
+              </div>
+              <div class="w-1/2">
+                <label class="info-label" for="result-long"
+                  >Vị Trí (Long)</label
+                >
+                <input
+                  type="text"
+                  id="result-long"
+                  class="info-input"
+                  placeholder="10590..."
+                />
+              </div>
+            </div>
+            <button
+              id="btn-search-coords"
+              class="w-full bg-indigo-100 text-indigo-700 border border-indigo-300 font-bold py-1 px-2 text-xs rounded hover:bg-indigo-200 transition-all mt-2"
+            >
+              <i class="fas fa-map-marker-alt"></i> Tìm theo tọa độ nhập tay
+            </button>
+          </div>
+
+          <div>
+            <label class="info-label" for="result-ngay-trong">Ngày Trồng</label>
+            <input
+              type="text"
+              id="result-ngay-trong"
+              class="info-input"
+              placeholder="Ví dụ: 15/01/2023"
+            />
+          </div>
+        </div>
+
+        <div
+          id="save-status"
+          class="text-center my-3 p-2 rounded-lg hidden text-sm font-bold"
+        ></div>
+
+        <div class="mt-4 space-y-2 pb-5">
+          <button
+            id="btn-select-location"
+            class="w-full bg-yellow-500 text-white font-bold py-2 px-3 text-sm rounded-lg hover:bg-yellow-600 transition-all shadow"
+          >
+            <i class="fas fa-crosshairs"></i> Chọn Vị Trí Trên Bản Đồ
+          </button>
+
+          <button
+            id="btn-remove-pin"
+            class="w-full bg-red-100 text-red-600 border border-red-200 font-bold py-2 px-3 text-sm rounded-lg hover:bg-red-200 transition-all"
+          >
+            <i class="fas fa-trash-alt"></i> Bỏ Ghim
+          </button>
+
+          <div class="pt-2">
+            <button
+              id="btn-scan-again"
+              class="w-full bg-gray-600 text-white font-bold py-3 px-3 text-sm rounded-lg hover:bg-gray-700 transition-all shadow"
+            >
+              <i class="fas fa-qrcode"></i> Quét Lại
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <script src="/js/script_map.js"></script>
+  </body>
+</html>

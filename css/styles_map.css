@@ -1,0 +1,230 @@
+/* --- CSS CHUNG --- */
+html,
+body {
+  margin: 0;
+  padding: 0;
+  font-family: Arial, sans-serif;
+  height: 100vh;
+  width: 100vw;
+  overflow: hidden;
+  font-size: 15px;
+}
+#btn-home {
+  margin-top: 12px;
+  position: absolute;
+  top: 20px;
+  left: 50px;
+  z-index: 2;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+}
+#map {
+  height: 100%;
+  width: 100%;
+  z-index: 1;
+}
+#search-bar-container {
+  position: absolute;
+  top: 20px;
+  left: 50%;
+  right: auto;
+  transform: translateX(-50%);
+  width: 65%;
+  max-width: 90%;
+  justify-content: center;
+  z-index: 999;
+  display: flex;
+  gap: 10px;
+}
+#search-input {
+  width: 100%;
+  padding: 12px 20px;
+  border: none;
+  border-radius: 50px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+  font-size: 16px;
+  flex-grow: 1;
+}
+
+#btn-search {
+  position: static;
+  transform: none;
+  white-space: nowrap;
+  z-index: 1;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+  border-radius: 30px;
+}
+#btn-start-scan-main {
+  position: absolute;
+  bottom: 30px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 999;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+}
+
+/* --- Panel (Desktop: top-right) --- */
+#scanner-panel {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  left: auto;
+  width: 360px;
+  max-width: 90%;
+  max-height: 90vh;
+  background-color: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+  z-index: 1000;
+  padding: 1rem;
+  /* Desktop layout */
+  display: flex;
+  flex-direction: column;
+  transition: opacity 0.3s ease-out, visibility 0.3s ease-out;
+}
+
+/* Thanh nắm kéo (chủ yếu cho mobile nhưng để chung cũng được) */
+#panel-grabber {
+  width: 40px;
+  height: 5px;
+  background-color: #ccc;
+  border-radius: 2.5px;
+  margin: 0 auto 10px;
+  flex-shrink: 0; /* Không bị co lại */
+}
+
+/* (MỚI) Nút Close Panel */
+.btn-close-panel {
+  position: absolute;
+  top: 15px;
+  right: 15px;
+  width: 32px;
+  height: 32px;
+  background-color: #f3f4f6;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  cursor: pointer;
+  color: #4b5563;
+  font-size: 16px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  z-index: 1001;
+  transition: all 0.2s;
+}
+.btn-close-panel:hover {
+  background-color: #ef4444; /* Màu đỏ khi hover */
+  color: white;
+}
+
+/* Nội dung cuộn được bên trong panel */
+#scanner-section,
+#result-section {
+  flex-grow: 1;
+  overflow-y: auto; /* Cho phép cuộn dọc */
+  padding-bottom: 10px;
+  /* Ẩn thanh cuộn cho đẹp */
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+#scanner-section::-webkit-scrollbar,
+#result-section::-webkit-scrollbar {
+  display: none;
+}
+
+/* Trạng thái ẩn (Desktop) */
+.hidden {
+  opacity: 0;
+  visibility: hidden;
+  display: none !important; /* Thêm !important để chắc chắn ẩn */
+}
+
+/* --- Panel (Mobile: Bottom Sheet) --- */
+@media (max-width: 640px) {
+  #btn-home {
+    top: 10px;
+    left: 10px;
+    padding: 8px 12px;
+    font-size: 14px;
+  }
+  #scanner-panel {
+    top: auto;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+
+    /* (CẬP NHẬT) Tăng chiều cao lên 80vh */
+    height: 80vh;
+    max-width: 100%;
+    max-height: 90vh;
+
+    border-radius: 20px 20px 0 0;
+    padding: 1rem;
+    padding-bottom: env(safe-area-inset-bottom);
+
+    transition: transform 0.3s ease-out, visibility 0.3s ease-out;
+    transform: translateY(0);
+    opacity: 1;
+    visibility: visible;
+  }
+
+  /* Trạng thái ẩn (Mobile) */
+  #scanner-panel.hidden {
+    display: flex !important; /* Giữ flex để transition hoạt động */
+    opacity: 1;
+    visibility: hidden;
+    transform: translateY(100%); /* Trượt hẳn xuống dưới */
+  }
+
+  #search-bar-container {
+    top: 20px;
+    left: auto;
+    right: 10px;
+    transform: none;
+    width: auto;
+    max-width: 80%;
+    justify-content: flex-end;
+  }
+  #search-input {
+    padding: 8px 15px;
+    font-size: 14px;
+  }
+  #btn-search {
+    padding: 8px 12px;
+    font-size: 14px;
+  }
+  #btn-start-scan-main {
+    bottom: 30px;
+  }
+}
+
+/* --- CSS CHO FORM --- */
+.info-label {
+  display: block;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #374151;
+  margin-bottom: 0.25rem;
+  margin-top: 0.5rem;
+}
+.info-input {
+  width: 100%;
+  padding: 0.4rem 0.6rem;
+  border: 1px solid #d1d5db;
+  border-radius: 0.375rem;
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  font-size: 0.9rem;
+  color: #1e40af;
+  font-weight: 500;
+}
+.info-input:focus {
+  outline: none;
+  box-shadow: 0 0 0 2px #22c55e;
+  border-color: #22c55e;
+}
+.info-value {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #111827;
+}
